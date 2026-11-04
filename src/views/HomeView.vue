@@ -28,22 +28,31 @@ import { RouterLink } from 'vue-router';
       <section class="steps">
         <div class="steps">
           <div class="step">
-            <h2>Opret din konto</h2>
+            <div class="step-number">1</div>
+            <h2>Step 1</h2>
           </div>
           <div class="step">
-            <h2>Vælg dine interesser</h2>
+            <div class="step-number">2</div>
+            <h2>Step 2</h2>
           </div>
           <div class="step">
-            <h2>Få anbefalinger til events</h2>
+            <div class="step-number">3</div>
+            <h2>Step 3</h2>
           </div>
         </div>
       </section>
 
       <section class="social-proof"> 
         <div class="testimonials">
-          <p>"KulturBooking har ændret måden, jeg søger efter kulturelle arrangementer på." - Fake person 1</p>
-          <p>"Jeg har opdaget så mange nye kunstnere og events gennem KulturBooking!" - Fake person 2</p>
-          <p>"KulturBooking har hjulpet mig med at finde nye og spændende kulturelle oplevelser." - Fake person 3</p>
+          <div class="testimonial-card">
+            <p>"KulturBooking har ændret måden, jeg søger efter kulturelle arrangementer på." - Fake person 1</p>
+          </div>
+          <div class="testimonial-card">
+            <p>"Jeg har opdaget så mange nye kunstnere og events gennem KulturBooking!" - Fake person 2</p>
+          </div>
+          <div class="testimonial-card">
+            <p>"KulturBooking har hjulpet mig med at finde nye og spændende kulturelle oplevelser." - Fake person 3</p>
+          </div>
         </div>
         <div class="highlight-video">
           <img src="@/assets/img/video_placeholder.jpg" alt="Highlight video" />
@@ -89,7 +98,7 @@ import { RouterLink } from 'vue-router';
   background-image:
   radial-gradient(
     #292B40F2 0%,
-    #292B40BF 40%,
+    #292B40BF 60%,
     #292B401A 100%
   ),
   url('@/assets/img/hero_image.jpg');
@@ -101,11 +110,10 @@ import { RouterLink } from 'vue-router';
 
 .hero-content {
   width: 100%;
-  max-width: 700px;
-  margin: 0 auto;
+  margin: 0 5%;
 
   h1 {
-    font-size: 3rem;
+    font-size: 2rem;
     margin-bottom: 1rem;
     color: $background-color;
   }
@@ -119,10 +127,25 @@ import { RouterLink } from 'vue-router';
 
 .steps {
   display: flex;
+  flex-direction: column;
   justify-content: space-around;
   align-items: center;
   gap: 2rem;
   padding: 2rem 5%;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 20%;
+  background-color: $primary-color;
+  color: $background-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
 }
 
 .step {
@@ -130,7 +153,7 @@ import { RouterLink } from 'vue-router';
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding: 1rem;
+  padding: 1rem 0;
   border-radius: 8px;
   h2 {
     color: $hero-text-color;
@@ -139,7 +162,7 @@ import { RouterLink } from 'vue-router';
 
 .social-proof {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 2rem;
@@ -151,7 +174,6 @@ import { RouterLink } from 'vue-router';
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 400px;
   p {
     color: $hero-text-color;
     font-style: italic;
@@ -160,7 +182,6 @@ import { RouterLink } from 'vue-router';
 }
 
 .highlight-video {
-  max-width: 400px;
   img {
     width: 100%;
     height: auto;
@@ -185,6 +206,47 @@ import { RouterLink } from 'vue-router';
 
   h2, p {
     color: $hero-text-color;
+  }
+}
+
+@media (min-width: 576px) {
+  .hero-content {
+    h1 {
+      font-size: 3rem;
+    }
+
+    p {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .steps {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 768px) {
+
+  .social-proof {
+    flex-direction: row;
+  }
+
+  .testimonials {
+    min-width: 50%;
+  }
+}
+
+@media (min-width: 1024px) {
+
+  .social-proof {
+    flex-direction: row;
+  }
+}
+
+@media (min-width: 1440px) {
+
+  .social-proof {
+    flex-direction: row;
   }
 }
 </style>
