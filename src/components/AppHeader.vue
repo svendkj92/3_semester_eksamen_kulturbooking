@@ -58,4 +58,13 @@ nav {
     color: $background-color;
   }
 }
+
+.cta-button {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  background-color: $cta-color;
+  color: $hero-text-color;
+  border-radius: 8px;
+  text-decoration: none;
+}
 </style>
