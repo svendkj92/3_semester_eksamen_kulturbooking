@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 // Layouts
 import LandingPageLayout from '@/layouts/LandingPageLayout.vue';
 import OnboardingLayout from '@/layouts/OnboardingLayout.vue';
+import MainLayout from '@/layouts/MainLayout.vue';
 
 // Views
 import HomeView from '@/views/HomeView.vue';
@@ -19,6 +20,18 @@ const router = createRouter({
           path: '',
           name: 'home',
           component: HomeView,
+        },
+      ],
+    },
+
+    {
+      path: '/',
+      component: MainLayout,
+      children: [
+        {
+          path: 'events',
+          name: 'events',
+          component: () => import('@/views/EventsView.vue'),
         },
       ],
     },
