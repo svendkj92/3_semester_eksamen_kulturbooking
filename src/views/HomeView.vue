@@ -1,26 +1,63 @@
 
 <script setup>
 import { RouterLink } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue';
+
+const words = [
+  'DANS?',
+  'KERAMIK?',
+  'KUNST?',
+  'MUSIK?',
+  'TEATER?',
+  'FOTOGRAFI?',
+];
+
+const currentIndex = ref(0);
+
+const currentWord = ref(words[currentIndex.value]);
+
+let interval = null;
+
+onMounted(() => {
+  interval = setInterval(() => {
+    currentIndex.value =
+      (currentIndex.value + 1) % words.length;
+
+    currentWord.value = words[currentIndex.value];
+  }, 3000);
+});
+
+onUnmounted(() => {
+  clearInterval(interval);
+});
 </script>
 
 <template>
   <div class="landing-page">
-
-    <!-- Hero section -->
     <main>
       <section class="hero">
         <div class="hero-content">
-          <h1>
-            Find din næste kulturoplevelse
-          </h1>
+              <h1 class="hero-title">
+                <span class="hero-title__intro">
+                  Er du til
+                </span>
+
+                <span class="word-window">
+                  <Transition name="roll" mode="out-in">
+                    <span :key="currentWord" class="animated-word">
+                      {{ currentWord }}
+                    </span>
+                  </Transition>
+                </span>
+              </h1>
 
           <p>
-            Oplev kultur, der matcher dine interesser.
+            Udforsk et bredt udvalg af kulturelle oplevelser i Odense.
             Find inspiration til din næste oplevelse.
           </p>
 
           <RouterLink to="/onboarding" class="cta-button">
-            CTA
+            Kom i gang
           </RouterLink>
         </div>
       </section>
@@ -106,37 +143,84 @@ import { RouterLink } from 'vue-router';
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+
+    h1 {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    color: $background-color;
+  }
+    p {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: $background-color;
+  }
 }
 
-.hero-content {
-  width: 100%;
-  margin: 0 5%;
+.hero-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0;
+  font-size: clamp(3rem, 10vw, 6rem);
+  line-height: 1.05;
+  font-weight: 700;
+}
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: $background-color;
-  }
+.hero-title__intro {
+  display: block;
+}
 
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    color: $background-color;
-  }
+.word-window {
+  align-items: center;
+  overflow: hidden;
+}
+
+.animated-word {
+  display: inline-block;
+  color: $background-color;
+  white-space: nowrap;
+  font-size: clamp(3rem, 12vw, 8rem);
+}
+
+.roll-enter-active,
+.roll-leave-active {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+}
+
+.roll-enter-from {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+.roll-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.roll-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.roll-leave-to {
+  transform: translateY(-100%);
+  opacity: 0;
 }
 
 .steps {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-around;
   align-items: center;
   gap: 2rem;
-  padding: 2rem 5%;
+  padding: 1rem 5%;
 }
 
 .step-number {
-  width: 40px;
-  height: 40px;
+  width: clamp(40px, 5vw, 60px);
+  height: clamp(40px, 5vw, 60px);
   border-radius: 20%;
   background-color: $primary-color;
   color: $background-color;
@@ -192,6 +276,7 @@ import { RouterLink } from 'vue-router';
 .cta-button {
   display: inline-block;
   padding: 0.8rem 1.5rem;
+  margin-top: 1.5rem;
   background-color: $cta-color;
   color: $hero-text-color;
   border-radius: 8px;
@@ -219,10 +304,6 @@ import { RouterLink } from 'vue-router';
       font-size: 1.5rem;
     }
   }
-  
-  .steps {
-    flex-direction: row;
-  }
 }
 
 @media (min-width: 768px) {
@@ -247,6 +328,13 @@ import { RouterLink } from 'vue-router';
 
   .social-proof {
     flex-direction: row;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll-enter-active,
+  .roll-leave-active {
+    transition: none;
   }
 }
 </style>

@@ -11,7 +11,6 @@ const navItems = [
   { title: 'Om os',
     type: 'anchor',
     href: '#about' },
-  { title: 'Contact', to: '/contact' }
 ];
 
 function toggleMenu() {
@@ -41,28 +40,44 @@ function closeMenu() {
       </button>
 
       <nav class="navigation" :class="{ 'navigation--open': menuIsOpen }">
-            <ul>
-                <li
-                v-for="item in navItems"
-                :key="item.title"
-                >
-                <RouterLink
-                    :to="item.to"
-                    @click="closeMenu"
-                >
-                    {{ item.title }}
-                </RouterLink>
-                </li>
-                <li>
-                <RouterLink
-                    to="/onboarding"
-                    class="cta-button"
-                    @click="closeMenu"
-                >
-                    CTA
-                </RouterLink>
-                </li>
-            </ul>
+            
+        <ul>
+        <li
+            v-for="item in navItems"
+            :key="item.title"
+        >
+            <!-- Internal section anchor -->
+            <a
+            v-if="item.type === 'anchor'"
+            :href="item.href"
+            @click="closeMenu"
+            >
+            {{ item.title }}
+            </a>
+
+            <!-- Vue Router link -->
+            <RouterLink
+            v-else-if="item.type === 'route'"
+            :to="item.href"
+            @click="closeMenu"
+            >
+            {{ item.title }}
+            </RouterLink>
+
+            <!-- External link -->
+            <a
+            v-else
+            :href="item.href"
+            target="_blank"
+            rel="noopener noreferrer"
+            @click="closeMenu"
+            >
+            {{ item.title }}
+            </a>
+
+        </li>
+        </ul>
+
       </nav>
     </header>
 </template>
@@ -75,9 +90,26 @@ function closeMenu() {
   justify-content: space-between;
   align-items: center;
   max-height: 80px;
-  padding: 1.5rem 5%;
+  padding: 5%;
   position: relative;
   background-color: $background-color;
+}
+
+// Mobile-first: Burger menu
+.burger-button {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  span {
+    width: 25px;
+    height: 2px;
+    background-color: currentColor;
+  }
 }
 
 .logo {
@@ -147,6 +179,48 @@ function closeMenu() {
   text-decoration: none;
 }
 
+
+// Mobile-first: Burger menu
+.burger-button {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  span {
+    width: 25px;
+    height: 2px;
+    background-color: currentColor;
+  }
+}
+
+.navigation {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  padding: 1.5rem;
+  background-color: #fff;
+  z-index: 10;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &.navigation--open {
+    display: block;
+  }
+}
+
 @media (min-width: 576px) {
     .header {
       max-height: 100px;  
@@ -156,5 +230,25 @@ function closeMenu() {
         width: 80px;
       }
     }
+}
+
+@media (min-width: 768px) {
+  .burger-button {
+    display: none;
+  }
+
+  .navigation {
+    display: block;
+    position: static;
+    width: auto;
+    padding: 0;
+    background: transparent;
+
+    ul {
+      flex-direction: row;
+      align-items: center;
+      gap: 2rem;
+    }
+  }
 }
 </style>

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
 // Layouts
-import MainLayout from '@/layouts/MainLayout.vue';
+import LandingPageLayout from '@/layouts/LandingPageLayout.vue';
 import OnboardingLayout from '@/layouts/OnboardingLayout.vue';
 
 // Views
@@ -13,7 +13,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      component: MainLayout,
+      component: LandingPageLayout,
       children: [
         {
           path: '',
