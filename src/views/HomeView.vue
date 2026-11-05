@@ -10,6 +10,9 @@ const words = [
   'MUSIK?',
   'TEATER?',
   'FOTOGRAFI?',
+  'FILM?',
+  'LITTERATUR?',
+  'DESIGN?',
 ];
 
 const currentIndex = ref(0);
@@ -52,7 +55,7 @@ onUnmounted(() => {
               </h1>
 
           <p>
-            Udforsk et bredt udvalg af kulturelle oplevelser i Odense.
+            Udforsk et bredt udvalg af kulturelle oplevelser og fællesskaber i Odense.
             Find inspiration til din næste oplevelse.
           </p>
 
@@ -63,20 +66,18 @@ onUnmounted(() => {
       </section>
 
       <section class="steps">
-        <div class="steps">
           <div class="step">
-            <div class="step-number">1</div>
-            <h2>Step 1</h2>
+            <div class="step-number">&#10004;</div>
+            <h2>Opret bruger</h2>
           </div>
           <div class="step">
-            <div class="step-number">2</div>
-            <h2>Step 2</h2>
+            <div class="step-number">&#10004;</div>
+            <h2>Vælg dine interesser</h2>
           </div>
           <div class="step">
-            <div class="step-number">3</div>
-            <h2>Step 3</h2>
+            <div class="step-number">&#10004;</div>
+            <h2>Find events og fællesskaber</h2>
           </div>
-        </div>
       </section>
 
       <section class="social-proof"> 
@@ -161,7 +162,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 1rem 0;
-  font-size: clamp(3rem, 10vw, 6rem);
+  font-size: clamp(2.5rem, 10vw, 6rem);
   line-height: 1.05;
   font-weight: 700;
 }
@@ -179,7 +180,7 @@ onUnmounted(() => {
   display: inline-block;
   color: $background-color;
   white-space: nowrap;
-  font-size: clamp(3rem, 12vw, 8rem);
+  font-size: clamp(2.5rem, 12vw, 8rem);
 }
 
 .roll-enter-active,
@@ -210,12 +211,27 @@ onUnmounted(() => {
 }
 
 .steps {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  align-items: start;
   padding: 1rem 5%;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1rem 0;
+  border-radius: 8px;
+  width: 100%;
+
+  h2 {
+    color: $hero-text-color;
+    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    font-weight: bold;
+  }
 }
 
 .step-number {
@@ -230,18 +246,6 @@ onUnmounted(() => {
   font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 1rem;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 1rem 0;
-  border-radius: 8px;
-  h2 {
-    color: $hero-text-color;
-  }
 }
 
 .social-proof {
