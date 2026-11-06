@@ -16,82 +16,81 @@ const categories = [
   'Design',
 ];
 
+//Event Images
+import jazzJamImage from '@/assets/img/event_images/jazz_jam.jpg';
+import hipHopDansWorkshopImage from '@/assets/img/event_images/hip_hop_danseworkshop.jpg';
+import teaterImage from '@/assets/img/event_images/teater.jpg';
+import designWorkshopImage from '@/assets/img/event_images/design_workshop.jpg';
+
 const events = ref([
   {
     id: 1,
-    title: 'En aften med live jazz',
+    title: 'Jazz Jam',
     category: 'Musik',
-    date: '15. NOV',
+    date: '2026-11-15',
     time: '19:00',
     location: 'Kulturmaskinen, Odense',
-    image: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629',
+    price: 'Gratis',
+    image: jazzJamImage,
     description: 'Oplev en stemningsfuld aften med live jazz og nye musikalske talenter.',
   },
   {
     id: 2,
-    title: 'Kreativt keramikværksted',
-    category: 'Kunst',
-    date: '18. NOV',
-    time: '16:00',
-    location: 'Kunstbygningen Filosoffen',
-    image: 'https://images.unsplash.com/photo-1565193298595-6e3b4e5e9e8e',
-    description: 'Slip kreativiteten løs og prøv kræfter med keramik i hyggelige omgivelser.',
-  },
-  {
-    id: 3,
-    title: 'Film under stjernerne',
-    category: 'Film',
-    date: '21. NOV',
-    time: '20:00',
-    location: 'Studenterhuset, Odense',
-    image: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba',
-    description: 'En hyggelig filmoplevelse med andre unge filmelskere.',
-  },
-  {
-    id: 4,
-    title: 'Dans dig fri',
+    title: 'Hip hop danseworkshop',
     category: 'Dans',
-    date: '23. NOV',
+    date: '2026-11-12',
     time: '17:30',
     location: 'Dansens Hus, Odense',
-    image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad',
+    price: 'Gratis',
+    image: hipHopDansWorkshopImage,
     description: 'En uformel danseworkshop, hvor alle kan være med.',
   },
   {
-    id: 5,
+    id: 3,
     title: 'Teater i øjenhøjde',
     category: 'Teater',
-    date: '26. NOV',
+    date: '2026-11-13',
     time: '19:30',
     location: 'Teater Momentum',
-    image: 'https://images.unsplash.com/photo-1503095396549-807759245b35',
+    price: '150 ,-',
+    image: teaterImage,
     description: 'Oplev moderne teater og mød nye mennesker.',
   },
   {
-    id: 6,
-    title: 'Design og idéudvikling',
+    id: 4,
+    title: 'Design workshop',
     category: 'Design',
-    date: '29. NOV',
+    date: '2026-11-29',
     time: '14:00',
     location: 'Kulturmaskinen, Odense',
-    image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a',
+    price: 'Gratis',
+    image: designWorkshopImage,
     description: 'En workshop for dig, der elsker at udvikle kreative idéer.',
   },
 ]);
 
 const filteredEvents = computed(() => {
-  return events.value.filter((event) => {
-    const matchesCategory =
-      selectedCategory.value === 'Alle' ||
-      event.category === selectedCategory.value;
+  return events.value
+    .filter((event) => {
+      const matchesCategory =
+        selectedCategory.value === 'Alle' ||
+        event.category === selectedCategory.value;
 
-    const matchesSearch =
-      event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchQuery.value.toLowerCase());
+      const matchesSearch =
+        event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchQuery.value.toLowerCase());
 
-    return matchesCategory && matchesSearch;
-  });
+      return matchesCategory && matchesSearch;
+    })
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
 });
+
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('da-DK', {
+    day: '2-digit',
+    month: 'long',
+  });
+};
 </script>
 
 <template>
@@ -101,7 +100,7 @@ const filteredEvents = computed(() => {
     <section class="events-section">
 
       <div class="events-section__header">
-
+        <h1>Udforsk events</h1>
         <p class="events-count">
           {{ filteredEvents.length }} events
         </p>
@@ -124,9 +123,9 @@ const filteredEvents = computed(() => {
       </div>
 
       <!-- Event cards -->
-      <div class="events-grid">
+      <div class="events-container">
 
-        <article
+        <div
           v-for="event in filteredEvents"
           :key="event.id"
           class="event-card"
@@ -138,8 +137,8 @@ const filteredEvents = computed(() => {
               loading="lazy"
             />
 
-            <div class="event-card__date">
-              <span>{{ event.date }}</span>
+            <div class="event-card__price">
+              <span>{{ event.price }}</span>
             </div>
 
             <span class="event-card__category">
@@ -148,14 +147,11 @@ const filteredEvents = computed(() => {
           </div>
 
           <div class="event-card__content">
+            <h3>{{ event.title }}</h3>
             <div class="event-card__meta">
-              <span>{{ event.time }}</span>
+              <span>{{ formatDate(event.date) }} kl.{{ event.time }}</span>
               <span>{{ event.location }}</span>
             </div>
-
-            <h3>{{ event.title }}</h3>
-
-            <p>{{ event.description }}</p>
 
             <RouterLink
               :to="`/events/${event.id}`"
@@ -165,7 +161,7 @@ const filteredEvents = computed(() => {
               <span aria-hidden="true">→</span>
             </RouterLink>
           </div>
-        </article>
+        </div>
 
       </div>
 
@@ -196,7 +192,6 @@ const filteredEvents = computed(() => {
 // Event overview
 .events-section {
   padding: 4rem 5%;
-  max-width: 1600px;
   margin: 0 auto;
 
   &__header {
@@ -206,7 +201,7 @@ const filteredEvents = computed(() => {
     gap: 1rem;
     margin-bottom: 2rem;
 
-    h2 {
+    h1 {
       color: $hero-text-color;
       font-size: clamp(2rem, 4vw, 3rem);
       margin-top: 0.5rem;
@@ -249,18 +244,23 @@ const filteredEvents = computed(() => {
   }
 }
 
-// Event grid
-.events-grid {
+// Event container
+.events-container {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 2rem;
 }
 
 .event-card {
   overflow: hidden;
+  max-width: 500px;
   border-radius: 12px;
   background-color: $hero-text-color;
   transition: transform 0.3s ease;
+
+  p, h3, .event-card__meta span {
+    color: $background-color;
+  }
 
   &:hover {
     transform: translateY(-5px);
@@ -276,7 +276,7 @@ const filteredEvents = computed(() => {
       height: 100%;
       object-fit: cover;
       display: block;
-      transition: transform 0.4s ease;
+      transition: transform 0.3s ease;
     }
   }
 
@@ -285,6 +285,17 @@ const filteredEvents = computed(() => {
   }
 
   &__date {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 6px;
+    background-color: $primary-color;
+    color: $background-color;
+    font-weight: bold;
+  }
+
+  &__price {
     position: absolute;
     top: 1rem;
     left: 1rem;
@@ -338,7 +349,7 @@ const filteredEvents = computed(() => {
     align-items: center;
     gap: 0.5rem;
     margin-top: 1rem;
-    color: $primary-color;
+    color: $cta-color;
     font-weight: bold;
     text-decoration: none;
 
@@ -360,20 +371,15 @@ const filteredEvents = computed(() => {
 }
 
 // Responsive
-@media (max-width: 1024px) {
-  .events-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .events-hero {
-    min-height: 40vh;
-    padding: 3rem 5%;
-  }
+@media (min-width: 768px) {
 
   .events-section {
     padding: 3rem 5%;
+    gap: 1.5rem;
+  }
+
+  .events-container {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .events-section__header {
@@ -381,12 +387,19 @@ const filteredEvents = computed(() => {
     flex-direction: column;
   }
 
-  .events-grid {
-    grid-template-columns: 1fr;
-  }
-
   .event-card__image {
     height: 220px;
   }
+}
+
+@media (min-width: 1024px) {
+  .events-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.event-card {
+  max-width: none;
+  width: 100%;
 }
 </style>

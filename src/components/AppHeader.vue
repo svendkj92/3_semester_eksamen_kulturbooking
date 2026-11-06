@@ -8,6 +8,9 @@ const navItems = [
   { title: 'KulturBooking',
     type: 'external',
     href: 'https://kulturbooking.dk' },
+  { title: 'Events',
+    type: 'anchor',
+    href: '/events' },
   { title: 'Om os',
     type: 'anchor',
     href: '#about' },
@@ -24,10 +27,7 @@ function closeMenu() {
 
 <template>
     <header class="header">
-      <RouterLink to="/" class="logo" @click="closeMenu">
-        <img src="@/assets/kb_logo.png" alt="KulturBooking" />
-      </RouterLink>
-
+      <img src="@/assets/kb_logo.png" alt="KulturBooking" />
       <button
         class="burger-button"
         @click="toggleMenu"
@@ -93,6 +93,15 @@ function closeMenu() {
   padding: 5%;
   position: relative;
   background-color: $background-color;
+    p {
+        margin: 0 0 0 1.5rem;
+        font-size: clamp(1rem, 5vw, 2rem);
+        font-weight: bold;
+    }
+    img {
+        width: 60px;
+        height: auto;
+    }
 }
 
 // Mobile-first: Burger menu
@@ -101,43 +110,14 @@ function closeMenu() {
   flex-direction: column;
   gap: 5px;
   padding: 0.5rem;
-  background: none;
   border: none;
   cursor: pointer;
+  background-color: $background-color;
 
   span {
     width: 25px;
     height: 2px;
-    background-color: currentColor;
-  }
-}
-
-.logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  text-decoration: none;
-  color: inherit;
-    img {
-        width: 60px;
-        height: auto;
-    }
-}
-
-.burger-button {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  span {
-    display: block;
-    width: 25px;
-    height: 2px;
-    background-color: currentColor;
-    transition: 0.3s ease;
+    background-color: $hero-text-color;
   }
 }
 
@@ -154,6 +134,7 @@ function closeMenu() {
   ul {
     display: flex;
     flex-direction: column;
+    background-color: $background-color;
     gap: 1.5rem;
     list-style: none;
     padding: 0;
@@ -163,57 +144,6 @@ function closeMenu() {
   a {
     text-decoration: none;
     color: inherit;
-  }
-
-  &.navigation--open {
-    display: block;
-  }
-}
-
-.cta-button {
-  display: inline-block;
-  padding: 0.8rem 1.5rem;
-  background-color: $cta-color;
-  color: $hero-text-color;
-  border-radius: 8px;
-  text-decoration: none;
-}
-
-
-// Mobile-first: Burger menu
-.burger-button {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  padding: 0.5rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  span {
-    width: 25px;
-    height: 2px;
-    background-color: currentColor;
-  }
-}
-
-.navigation {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  padding: 1.5rem;
-  background-color: #fff;
-  z-index: 10;
-
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
   }
 
   &.navigation--open {
