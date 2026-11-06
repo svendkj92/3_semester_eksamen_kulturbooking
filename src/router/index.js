@@ -30,6 +30,11 @@ const router = createRouter({
           name: 'events',
           component: () => import('@/views/EventsView.vue'),
         },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('@/views/ProfileView.vue'),
+        },
       ],
     },
 
