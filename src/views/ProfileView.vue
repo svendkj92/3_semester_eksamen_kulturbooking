@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
-import { getUserProfile, updateUserInterests } from '@/services/userService';
+import { getUserProfile, updateUserInterests, updateUserProfile } from '@/services/userService';
 
 const user = shallowRef(null);
 const profile = ref(null);
@@ -15,6 +15,11 @@ const newInterest = ref('');
 const isSaving = ref(false);
 const editError = ref('');
 const saveMessage = ref('');
+const isEditingName = ref(false);
+const draftName = ref('');
+const isSavingName = ref(false);
+const nameError = ref('');
+const nameSaveMessage = ref('');
 const displayName = computed(() => profile.value?.displayName || user.value?.displayName || 'Min profil');
 let unsubscribe;
 let requestId = 0;
@@ -37,6 +42,11 @@ async function loadProfile(authUser) {
   newInterest.value = '';
   editError.value = '';
   saveMessage.value = '';
+  isEditingName.value = false;
+  draftName.value = '';
+  isSavingName.value = false;
+  nameError.value = '';
+  nameSaveMessage.value = '';
   isLoading.value = Boolean(authUser);
   if (!authUser) return;
 
@@ -70,6 +80,54 @@ function startEditing() {
   editError.value = '';
   saveMessage.value = '';
   isEditing.value = true;
+}
+
+function cancelEditing() {
+  editError.value = '';
+  newInterest.value = '';
+  isEditing.value = false;
+}
+
+function startEditingName() {
+  draftName.value = displayName.value === 'Min profil' ? '' : displayName.value;
+  nameError.value = '';
+  nameSaveMessage.value = '';
+  isEditingName.value = true;
+}
+
+function cancelEditingName() {
+  nameError.value = '';
+  isEditingName.value = false;
+}
+
+async function saveName() {
+  if (isSavingName.value) return;
+  if (!user.value || auth.currentUser?.uid !== user.value.uid) {
+    nameError.value = 'Du skal være logget ind for at ændre dit navn.';
+    return;
+  }
+  const trimmedName = draftName.value.trim();
+  if (!trimmedName) {
+    nameError.value = 'Skriv et navn, før du gemmer.';
+    return;
+  }
+  const id = requestId;
+  const uid = user.value.uid;
+  isSavingName.value = true;
+  nameError.value = '';
+  try {
+    await updateUserProfile(uid, { displayName: trimmedName });
+    if (id !== requestId) return;
+    profile.value = { ...profile.value, displayName: trimmedName };
+    isEditingName.value = false;
+    nameSaveMessage.value = 'Dit navn er gemt.';
+  } catch {
+    if (id === requestId) {
+      nameError.value = 'Navnet kunne ikke gemmes. Prøv igen.';
+    }
+  } finally {
+    if (id === requestId) isSavingName.value = false;
+  }
 }
 
 function addInterest() {
@@ -171,7 +229,43 @@ onUnmounted(() => {
               <span aria-hidden="true">+</span>
             </button>
           </div>
-          <h2 id="profile-name">{{ displayName }}</h2>
+          <div class="identity-name">
+            <h2 id="profile-name">{{ displayName }}</h2>
+            <button
+              v-if="!isEditingName"
+              class="icon-button edit-name-button"
+              type="button"
+              aria-label="Rediger navn"
+              title="Rediger dit navn"
+              @click="startEditingName"
+            >
+              <span aria-hidden="true">✎</span>
+            </button>
+          </div>
+          <form v-if="isEditingName" class="name-editor" @submit.prevent="saveName">
+            <fieldset :disabled="isSavingName">
+              <legend class="visually-hidden">Rediger dit navn</legend>
+              <label for="display-name">Dit navn</label>
+              <input
+                id="display-name"
+                v-model="draftName"
+                type="text"
+                :aria-invalid="Boolean(nameError)"
+                :aria-describedby="nameError ? 'name-error' : undefined"
+              />
+              <p v-if="nameError" id="name-error" class="error-message" role="alert">{{ nameError }}</p>
+              <div class="editor-actions">
+                <button class="action-button" type="submit">
+                  {{ isSavingName ? 'Gemmer…' : 'Gem navn' }}
+                </button>
+                <button class="action-button secondary-button" type="button" @click="cancelEditingName">
+                  Annuller
+                </button>
+              </div>
+            </fieldset>
+          </form>
+          <p v-if="profile.email" class="profile-email">{{ profile.email }}</p>
+          <p v-if="nameSaveMessage" class="save-message" role="status">{{ nameSaveMessage }}</p>
         </section>
 
         <section class="interests-section" aria-labelledby="interests-heading">
@@ -218,7 +312,7 @@ onUnmounted(() => {
                 <button class="action-button" type="button" @click="saveInterests">
                   {{ isSaving ? 'Gemmer…' : 'Gem interesser' }}
                 </button>
-                <button class="action-button secondary-button" type="button" @click="isEditing = false">
+                <button class="action-button secondary-button" type="button" @click="cancelEditing">
                   Annuller
                 </button>
               </div>
@@ -296,10 +390,62 @@ onUnmounted(() => {
   }
 }
 
-.preview-notice {
-  margin: 1rem 0 2rem;
-  font-size: 0.8125rem;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.identity-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.edit-name-button {
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+}
+
+.profile-email {
+  margin: 0;
   color: $secondary-color;
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.name-editor {
+  width: 100%;
+  max-width: 320px;
+
+  fieldset {
+    display: grid;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    min-width: 0;
+  }
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba($secondary-color, 0.4);
+    border-radius: 6px;
+    font: inherit;
+  }
 }
 
 .profile-layout,
