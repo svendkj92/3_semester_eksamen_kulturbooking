@@ -83,13 +83,13 @@ onUnmounted(() => {
       <section class="social-proof"> 
         <div class="testimonials">
           <div class="testimonial-card">
-            <p>"KulturBooking har ændret måden, jeg søger efter kulturelle arrangementer på." - Fake person 1</p>
+            <p><span lang="en">"Somebody always kind of has your back."</span> - Event deltager</p>
           </div>
           <div class="testimonial-card">
-            <p>"Jeg har opdaget så mange nye kunstnere og events gennem KulturBooking!" - Fake person 2</p>
+            <p><span lang="en">"KulturBooking is a place for people to find their place and their voice."</span> - Event deltager</p>
           </div>
           <div class="testimonial-card">
-            <p>"KulturBooking har hjulpet mig med at finde nye og spændende kulturelle oplevelser." - Fake person 3</p>
+            <p>"Det handler om både at lave events, som alle kan være med til, men også at støtte unge kunstnere og artister her i Odense." - Event deltager</p>
           </div>
         </div>
         <div class="highlight-video">
