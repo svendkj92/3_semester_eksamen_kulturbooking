@@ -5,6 +5,19 @@ import LandingPageLayout from '@/layouts/LandingPageLayout.vue';
 import OnboardingLayout from '@/layouts/OnboardingLayout.vue';
 import MainLayout from '@/layouts/MainLayout.vue';
 
+const informationPages = [
+  { path: 'skabere', title: 'Skabere', description: 'Her kommer et overblik over skabere på KulturBooking.' },
+  { path: 'hangouts', title: 'Hangouts', description: 'Her kommer et overblik over hangouts på KulturBooking.' },
+  { path: 'faellesskaber', title: 'Fællesskaber', description: 'Her kommer et overblik over fællesskaber på KulturBooking.' },
+  { path: 'om', title: 'Om KulturBooking', description: 'Her kommer information om KulturBooking.' },
+  { path: 'effekt', title: 'Effekt', description: 'Her kommer information om KulturBookings effekt.' },
+  { path: 'kontakt', title: 'Kontakt', description: 'Her kommer kontaktoplysninger til KulturBooking.' },
+  { path: 'blog', title: 'Blog', description: 'Her kommer indlæg og nyheder fra KulturBooking.' },
+  { path: 'privatliv', title: 'Privatliv', description: 'Privatlivspolitikken er endnu ikke tilgængelig. Her kommer information om behandling af personoplysninger.' },
+  { path: 'servicevilkaar', title: 'Servicevilkår', description: 'Servicevilkårene er endnu ikke tilgængelige. Her kommer vilkår for brug af KulturBooking.' },
+  { path: 'data-sikkerhed', title: 'Data & sikkerhed', description: 'Her kommer information om data og sikkerhed på KulturBooking.' },
+];
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
 
@@ -35,6 +48,12 @@ const router = createRouter({
           name: 'profile',
           component: () => import('@/views/ProfileView.vue'),
         },
+        ...informationPages.map(({ path, title, description }) => ({
+          path,
+          name: path,
+          component: () => import('@/views/InformationView.vue'),
+          props: { title, description },
+        })),
       ],
     },
 
