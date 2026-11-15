@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
-import OnboardingRoleSelection from '@/components/onboarding/OnboardingRoleSelection.vue'
-import OnboardingInterestSelection from '@/components/onboarding/OnboardingInterestSelection.vue'
-import OnboardingProfileSetup from '@/components/onboarding/OnboardingProfileSetup.vue'
+import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
+import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
+import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
 const email = ref('')
 const codeSent = ref(false)
