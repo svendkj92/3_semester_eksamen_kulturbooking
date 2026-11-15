@@ -45,29 +45,29 @@ function closeOnboarding() {
 <template>
   <div class="signup-page">
      <section class="signup-content">
-         <h1>Welcome to KulturBookins team!</h1>
+         <h1>Velkommen til KulturBooking!</h1>
 
          <div class="social-login">
              <button type="button">
-                 Continue with Apple
+                 Fortsæt with Apple
              </button>
 
              <button type="button">
-                 Continue with Google
+                 Fortsæt with Google
              </button>
          </div>
 
          <div class="divider">
-             <span>Or</span>
+             <span>Eller</span>
          </div>
          <form class="email-login" novalidate>
-             <label for="email">Email</label>
+             <label for="email">E-mail</label>
              <input
                  id="email"
                  v-model="email"
                  type="email"
                  autocomplete="email"
-                 placeholder="Enter your email"
+                 placeholder="Indtast din e-mailadresse"
                  @blur="emailTouched = true"
                  :class="{
                  'input-error': emailTouched && email && !isEmailValid
@@ -76,25 +76,25 @@ function closeOnboarding() {
                <p
                  v-if="emailTouched && email && !isEmailValid"
                  class="email-error">
-                 Please enter a valid email address.
+                 Indtast venligst en gyldig e-mailadresse.
               </p>
               <div v-if="codeSent" class="verification-code">
-                 <label for="verification-code">Verification code</label>
+                 <label for="verification-code">Bekræftelseskoden</label>
                  <input
                      id="verification-code"
                      v-model="verificationCode"
                      type="text"
                      inputmode="numeric"
                      autocomplete="one-time-code"
-                     placeholder="Enter verification code"
+                     placeholder="Indtast bekræftelseskoden"
                    />
                    <p v-if="codeError" class="code-error" role="alert">
                      {{ codeError }}
                    </p>
              </div>
              <p v-if="codeSent" class="privacy-policy">
-                 By continuing, you agree to our
-                 <a href="#">Privacy Policy</a>.
+                 Ved at fortsætte accepterer du vores
+                 <a href="#">Privatlivspolitik</a>.
              </p>
           </form>
 
@@ -104,14 +104,14 @@ function closeOnboarding() {
 
              <button
                type="button"
-               aria-label="Close onboarding"
+               aria-label="Luk onboarding"
                @click="closeOnboarding"
              >
                  x
              </button>
 
              <p class="onboarding-progress">
-                 Step {{ currentStep }} of 3
+                 Trin  {{ currentStep }} af 3
              </p>
 
              <OnboardingRoleSelection 
@@ -126,13 +126,13 @@ function closeOnboarding() {
                         v-if="currentStep > 1"
                         @click="previousStep"
                     >
-                        Back
+                        Tilbage
                     </button>
                     <button
                         v-if="currentStep < 3"
                         @click="nextStep"
                     >
-                        Next
+                        Næste
                     </button>
              </div>
           </div>
