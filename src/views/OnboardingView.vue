@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import OnboardingRoleSelection from '@/components/onboarding/OnboardingRoleSelection.vue'
+import OnboardingInterestSelection from '@/components/onboarding/OnboardingInterestSelection.vue'
+import OnboardingProfileSetup from '@/components/onboarding/OnboardingProfileSetup.vue'
 
 const email = ref('')
 const codeSent = ref(false)
@@ -14,6 +16,30 @@ const isCodeNumeric = computed(() => {
 })
 const codeError = ref('')
 const emailVerified = ref(false)
+const currentStep = ref(1)
+const isOnboardingOpen = ref(true)
+const selectedRole = ref('')
+
+function nextStep() {
+  if (currentStep.value === 1 && !selectedRole.value) {
+    selectedRole.value = 'udforsker'
+  }
+  if (currentStep.value < 3) {
+    currentStep.value++
+  }
+}
+function previousStep() {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+function closeOnboarding() {
+  if (!selectedRole.value) {
+    selectedRole.value = 'udforsker'
+  }
+  isOnboardingOpen.value = false
+}
+
 </script>
 
 <template>
@@ -71,9 +97,45 @@ const emailVerified = ref(false)
                  <a href="#">Privacy Policy</a>.
              </p>
           </form>
-          <div v-if="emailVerified" class="onboarding-overlay">
-             <OnboardingRoleSelection />
-         </div>
+
+          <div 
+            v-if="emailVerified && isOnboardingOpen"
+            class="onboarding-overlay">
+
+             <button
+               type="button"
+               aria-label="Close onboarding"
+               @click="closeOnboarding"
+             >
+                 x
+             </button>
+
+             <p class="onboarding-progress">
+                 Step {{ currentStep }} of 3
+             </p>
+
+             <OnboardingRoleSelection 
+                 v-if="currentStep === 1"
+                 v-model="selectedRole"
+                />
+             <OnboardingInterestSelection v-else-if="currentStep === 2" />
+             <OnboardingProfileSetup v-else-if="currentStep === 3" />
+
+             <div class="onboarding-navigation">
+                    <button
+                        v-if="currentStep > 1"
+                        @click="previousStep"
+                    >
+                        Back
+                    </button>
+                    <button
+                        v-if="currentStep < 3"
+                        @click="nextStep"
+                    >
+                        Next
+                    </button>
+             </div>
+          </div>
      </section>
   </div>
 </template>
