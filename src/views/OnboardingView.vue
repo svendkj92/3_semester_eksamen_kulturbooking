@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import OnboardingRoleSelection from '@/components/onboarding/OnboardingRoleSelection.vue'
 
 const email = ref('')
 const codeSent = ref(false)
@@ -71,7 +72,7 @@ const emailVerified = ref(false)
              </p>
           </form>
           <div v-if="emailVerified" class="onboarding-overlay">
-             <p>Onboarding starts here</p>
+             <OnboardingRoleSelection />
          </div>
      </section>
   </div>
