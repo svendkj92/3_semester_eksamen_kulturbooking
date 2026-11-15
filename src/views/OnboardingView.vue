@@ -208,6 +208,10 @@ function finishOnboarding() {
     border: 1px solid $hero-text-color;
     border-radius: 4px;
     box-sizing: border-box;
+
+    &.input-error {
+      border-color: #DC2626;
+    }
   }
 }
 .email-error {
@@ -215,9 +219,6 @@ function finishOnboarding() {
 }
 .email-success {
   color: #166534;
-}
-&.input-error {
-  border-color: #DC2626;
 }
 
 .code-error {

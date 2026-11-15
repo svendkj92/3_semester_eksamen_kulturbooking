@@ -8,7 +8,9 @@ const image = defineModel('image', {
 })
 import { ref, onUnmounted } from 'vue'
 
-const imagePreview = ref(null)
+const imagePreview = ref(
+    image.value ? URL.createObjectURL(image.value) : null
+)
 
 function handleImageChange(event) {
   const file = event.target.files?.[0] ?? null

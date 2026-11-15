@@ -10,22 +10,22 @@ const interests = []
 
   <section class="interest-selection">
     <h2>Vælg dine interesser</h2>
-  </section>
-
-  <div class="interest-options">
-      <label
-         v-for="interest in interests"
-         :key="interest.value"
-         class="interest-option"
-         >
-         <input
+  
+     <div class="interest-options">
+          <label
+              v-for="interest in interests"
+              :key="interest.value"
+              class="interest-option"
+            >
+          <input
              v-model="selectedInterests"
              type="checkbox"
              :value="interest.value"
            />
-         <span>{{ interest.label }}</span>
-       </label>
-  </div>
+             <span>{{ interest.label }}</span>
+           </label>
+      </div>
+  </section>
 
 </template>
 
