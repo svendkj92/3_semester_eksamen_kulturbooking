@@ -20,6 +20,8 @@ const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
 const selectedRole = ref('')
 const selectedInterests = ref([])
+const profileBio = ref('')
+const profileImage = ref(null)
 
 function nextStep() {
   if (currentStep.value === 1 && !selectedRole.value) {
@@ -39,6 +41,10 @@ function closeOnboarding() {
     selectedRole.value = 'udforsker'
   }
   isOnboardingOpen.value = false
+}
+
+function finishOnboarding() {
+  closeOnboarding()
 }
 
 </script>
@@ -123,7 +129,11 @@ function closeOnboarding() {
                  v-else-if="currentStep === 2" 
                  v-model="selectedInterests"
                  />
-             <OnboardingProfileSetup v-else-if="currentStep === 3" />
+             <OnboardingProfileSetup 
+                 v-else-if="currentStep === 3" 
+                 v-model:bio="profileBio"
+                 v-model:image="profileImage"
+                />
 
              <div class="onboarding-navigation">
                     <button
@@ -137,6 +147,13 @@ function closeOnboarding() {
                         @click="nextStep"
                     >
                         Næste
+                    </button>
+                    <button
+                        v-if="currentStep === 3"
+                        @click="finishOnboarding"
+                        type="button"
+                    >
+                        Afslut
                     </button>
              </div>
           </div>
