@@ -12,72 +12,69 @@ const isCodeNumeric = computed(() => {
   return /^[0-9]+$/.test(verificationCode.value)
 })
 const codeError = ref('')
+const emailVerified = ref(false)
 </script>
 
 <template>
   <div class="signup-page">
-    <section class="signup-content">
+     <section class="signup-content">
+         <h1>Welcome to KulturBookins team!</h1>
 
-      <h1>Welcome to KulturBookins team!</h1>
+         <div class="social-login">
+             <button type="button">
+                 Continue with Apple
+             </button>
 
-      <div class="social-login">
-        <button type="button">
-          Continue with Apple
-        </button>
+             <button type="button">
+                 Continue with Google
+             </button>
+         </div>
 
-        <button type="button">
-          Continue with Google
-        </button>
-      </div>
-
-      <div class="divider">
-        <span>Or</span>
-      </div>
-
-      
-    <form class="email-login" novalidate>
-     <label for="email">Email</label>
-      <input
-      id="email"
-      v-model="email"
-      type="email"
-      autocomplete="email"
-      placeholder="Enter your email"
-      @blur="emailTouched = true"
-      :class="{
-      'input-error': emailTouched && email && !isEmailValid
-      }"
-     />
-
-      <p
-        v-if="emailTouched && email && !isEmailValid"
-        class="email-error">
-        Please enter a valid email address.
-      </p>
-
-  <div v-if="codeSent" class="verification-code">
-    <label for="verification-code">Verification code</label>
-    <input
-      id="verification-code"
-      v-model="verificationCode"
-      type="text"
-      inputmode="numeric"
-      autocomplete="one-time-code"
-      placeholder="Enter verification code"
-      />
-    <p v-if="codeError" class="code-error" role="alert">
-      {{ codeError }}
-    </p>
+         <div class="divider">
+             <span>Or</span>
+         </div>
+         <form class="email-login" novalidate>
+             <label for="email">Email</label>
+             <input
+                 id="email"
+                 v-model="email"
+                 type="email"
+                 autocomplete="email"
+                 placeholder="Enter your email"
+                 @blur="emailTouched = true"
+                 :class="{
+                 'input-error': emailTouched && email && !isEmailValid
+                 }"
+              />
+               <p
+                 v-if="emailTouched && email && !isEmailValid"
+                 class="email-error">
+                 Please enter a valid email address.
+              </p>
+              <div v-if="codeSent" class="verification-code">
+                 <label for="verification-code">Verification code</label>
+                 <input
+                     id="verification-code"
+                     v-model="verificationCode"
+                     type="text"
+                     inputmode="numeric"
+                     autocomplete="one-time-code"
+                     placeholder="Enter verification code"
+                   />
+                   <p v-if="codeError" class="code-error" role="alert">
+                     {{ codeError }}
+                   </p>
+             </div>
+             <p v-if="codeSent" class="privacy-policy">
+                 By continuing, you agree to our
+                 <a href="#">Privacy Policy</a>.
+             </p>
+          </form>
+          <div v-if="emailVerified" class="onboarding-overlay">
+             <p>Onboarding starts here</p>
+         </div>
+     </section>
   </div>
-  <p v-if="codeSent" class="privacy-policy">
-     By continuing, you agree to our
-     <a href="#">Privacy Policy</a>.
-  </p>
-    </form>
-
-
-    </section>
-</div>
 </template>
 
 <style lang="scss" scoped>
