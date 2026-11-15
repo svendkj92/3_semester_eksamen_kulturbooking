@@ -19,6 +19,7 @@ const emailVerified = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
 const selectedRole = ref('')
+const selectedInterests = ref([])
 
 function nextStep() {
   if (currentStep.value === 1 && !selectedRole.value) {
@@ -49,11 +50,11 @@ function closeOnboarding() {
 
          <div class="social-login">
              <button type="button">
-                 Fortsæt with Apple
+                 Fortsæt med Apple
              </button>
 
              <button type="button">
-                 Fortsæt with Google
+                 Fortsæt med Google
              </button>
          </div>
 
@@ -118,7 +119,10 @@ function closeOnboarding() {
                  v-if="currentStep === 1"
                  v-model="selectedRole"
                 />
-             <OnboardingInterestSelection v-else-if="currentStep === 2" />
+             <OnboardingInterestSelection 
+                 v-else-if="currentStep === 2" 
+                 v-model="selectedInterests"
+                 />
              <OnboardingProfileSetup v-else-if="currentStep === 3" />
 
              <div class="onboarding-navigation">

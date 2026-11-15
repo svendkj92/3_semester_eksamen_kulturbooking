@@ -22,7 +22,7 @@ const roles = [
             class="role-label"
         >
          <input
-           V-model="selectedRole"
+           v-model="selectedRole"
            type="radio"
            name="role"
            :value="role.value"
