@@ -1,6 +1,10 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { registerUser, sendVerificationEmail } from '@/services/authService'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import {
+  registerUser,
+  sendVerificationEmail,
+  observeAuthState
+} from '@/services/authService'
 import { reload } from 'firebase/auth'
 import { auth } from '@/services/firebase'
 import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
@@ -38,6 +42,29 @@ const selectedRole = ref('')
 const selectedInterests = ref([])
 const profileBio = ref('')
 const profileImage = ref(null)
+let unsubscribeAuth = null
+
+onMounted(() => {
+  unsubscribeAuth = observeAuthState((user) => {
+    if (user) {
+      if (registeredUser.value?.uid !== user.uid) {
+        verificationEmailSent.value = false
+      }
+
+      registeredUser.value = user
+      email.value = user.email || ''
+      emailVerified.value = user.emailVerified
+    } else {
+      registeredUser.value = null
+      emailVerified.value = false
+      verificationEmailSent.value = false
+    }
+  })
+})
+
+onUnmounted(() => {
+  unsubscribeAuth?.()
+})
 
 async function handleSignup() {
   if (
@@ -264,12 +291,16 @@ function finishOnboarding() {
             Send bekræftelsesmail igen
           </button>
 
-          <p v-if="verificationEmailSent" class="email-success">
-            En bekræftelsesmail er sendt til {{ email }}. Tjek din indbakke for at bekræfte din e-mailadresse.
+          <p 
+           v-if="registeredUser && !emailVerified && !verificationEmailSent"
+           role="status"
+          >
+           Din konto er oprettet, men din e-mail er endnu ikke bekræftet.
+           Du kan sende en bekræftelsesmail eller kontrollere, om du allerede har bekræftet den.
           </p>
 
           <button
-            v-if="verificationEmailSent && !emailVerified"
+            v-if="registeredUser && !emailVerified"
             type="button"
             @click="checkEmailVerification"
             :disabled="isCheckingVerification"
