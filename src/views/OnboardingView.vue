@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { registerUser, sendVerificationEmail } from '@/services/authService'
 import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
@@ -8,6 +9,7 @@ const name = ref('')
 const email = ref('')
 const password = ref('')
 const emailTouched = ref(false)
+const passwordTouched = ref(false)
 const isEmailValid = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
 })
@@ -23,12 +25,44 @@ const isFormValid = computed(() => {
     isPasswordValid.value
 })
 const emailVerified = ref(false)
+const isSigningUp = ref(false)
+const signupError = ref('')
+const verificationEmailSent = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
 const selectedRole = ref('')
 const selectedInterests = ref([])
 const profileBio = ref('')
 const profileImage = ref(null)
+
+async function handleSignup() {
+  if (!isFormValid.value || isSigningUp.value || verificationEmailSent.value) {
+    return
+  }
+
+  isSigningUp.value = true
+  signupError.value = ''
+
+  try {
+    const user = await registerUser(
+      name.value.trim(),
+      email.value.trim(),
+      password.value
+    )
+
+    await sendVerificationEmail(user)
+
+    verificationEmailSent.value = true
+    password.value = ''
+  } catch (error) {
+    console.error('Signup failed:', error.code || error.message)
+
+    signupError.value =
+      'Registreringen kunne ikke gennemføres. Prøv igen eller kontakt os.'
+  } finally {
+    isSigningUp.value = false
+  }
+}
 
 function nextStep() {
   if (currentStep.value === 1 && !selectedRole.value) {
@@ -74,7 +108,7 @@ function finishOnboarding() {
          <div class="divider">
              <span>Eller</span>
          </div>
-         <form class="email-login" novalidate>  
+         <form class="email-login" novalidate @submit.prevent="handleSignup">
              <div class="name-field">
                 <label for="name">Navn</label>
                   <input
@@ -106,21 +140,43 @@ function finishOnboarding() {
               <div class="password-field">
                  <label for="password">Adgangskode</label>
                  <input
-                     id="password"
-                     v-model="password"
-                     type="password"
-                     autocomplete="new-password"
-                     placeholder="Opret en adgangskode"
-                     minlength="6"
-                     required
+                    id="password"
+                    v-model="password"
+                    type="password"
+                    autocomplete="new-password"
+                    placeholder="Opret en adgangskode"
+                    minlength="6"
+                    required
+                    @blur="passwordTouched = true"
+                    :class="{ 'input-error': passwordTouched && password && !isPasswordValid }"
                   />
+                  <p
+                    v-if="passwordTouched && password && !isPasswordValid"
+                    class="email-error">
+                    Adgangskoden skal være mindst 6 tegn lang.
+                  </p>
               </div>
 
              <p class="privacy-policy">
                  Ved at fortsætte accepterer du vores
                  <a href="#">Privatlivspolitik</a>.
              </p>
-          </form>
+
+             <button
+                type="submit"
+                :disabled="!isFormValid || isSigningUp || verificationEmailSent"
+             >
+                {{ isSigningUp ? 'Opretter konto...' : 'Opret konto' }}
+             </button>
+
+             <p v-if="signupError" class="email-error" role="alert">
+                 {{ signupError }}
+             </p>
+
+             <p v-if="verificationEmailSent" class="email-success">
+                En bekræftelsesmail er sendt til {{ email }}. Tjek din indbakke for at bekræfte din e-mailadresse.
+             </p>
+         </form>
 
           <div 
             v-if="emailVerified && isOnboardingOpen"
