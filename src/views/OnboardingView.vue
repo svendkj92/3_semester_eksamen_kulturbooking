@@ -4,11 +4,23 @@ import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
+const name = ref('')
 const email = ref('')
 const password = ref('')
 const emailTouched = ref(false)
 const isEmailValid = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
+})
+const isNameValid = computed(() => {
+  return name.value.trim().length > 0
+})
+const isPasswordValid = computed(() => {
+  return password.value.length >= 6
+})
+const isFormValid = computed(() => {
+  return isNameValid.value &&
+    isEmailValid.value &&
+    isPasswordValid.value
 })
 const emailVerified = ref(false)
 const currentStep = ref(1)
@@ -64,6 +76,17 @@ function finishOnboarding() {
          </div>
          <form class="email-login" novalidate>
              <label for="email">E-mail</label>
+             <div class="name-field">
+                <label for="name">Navn</label>
+                  <input
+                    id="name"
+                    v-model="name"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Indtast dit navn"
+                    required
+                  />
+             </div>
              <input
                  id="email"
                  v-model="email"
