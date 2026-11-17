@@ -147,7 +147,7 @@ onUnmounted(() => {
           <p v-if="hasStarted">Eventet er startet. Der kan ikke oprettes nye tilmeldinger.</p>
           <p v-else-if="!user">
             Log ind for at tilmelde dig.
-            <RouterLink to="/onboarding">Gå til brugeroprettelse</RouterLink>
+            <RouterLink :to="{ name: 'login', query: { redirect: route.path } }">Log ind</RouterLink>
           </p>
           <button
             v-if="user && (isRegistered || !hasStarted)"

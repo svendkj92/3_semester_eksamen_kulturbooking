@@ -5,6 +5,7 @@ import {
   signOut,
   updateProfile,
   sendEmailVerification,
+  sendPasswordResetEmail,
   onAuthStateChanged
 } from 'firebase/auth';
 
@@ -40,6 +41,10 @@ export async function loginUser(email, password) {
   );
 
   return userCredential.user;
+}
+
+export async function resetPassword(email) {
+  await sendPasswordResetEmail(auth, email);
 }
 
 // Logout current user

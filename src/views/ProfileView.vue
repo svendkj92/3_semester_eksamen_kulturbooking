@@ -270,6 +270,7 @@ onUnmounted(() => {
     </div>
     <p v-else-if="!user" class="profile-notice" role="status">
       Log ind for at se din profil og dine interesser.
+      <RouterLink to="/login">Log ind</RouterLink>
     </p>
 
     <div v-else-if="profile" class="profile-layout">
