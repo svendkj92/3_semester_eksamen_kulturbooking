@@ -1,9 +1,10 @@
 <script setup>
+import { interests } from '@/services/interestService';
+
 const selectedInterests = defineModel({
   type: Array,
   default: () => []
 })
-const interests = []
 </script>
 
 <template>

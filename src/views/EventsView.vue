@@ -2,19 +2,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { RouterLink } from 'vue-router';
+import { interests } from '@/services/interestService';
 
 const searchQuery = ref('');
 const selectedCategory = ref('Alle');
 
-const categories = [
-  'Alle',
-  'Musik',
-  'Kunst',
-  'Dans',
-  'Film',
-  'Teater',
-  'Design',
-];
+const categories = ['Alle', ...interests.map((interest) => interest.value)];
 
 //Event Images
 import jazzJamImage from '@/assets/img/event_images/jazz_jam.jpg';

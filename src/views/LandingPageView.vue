@@ -2,18 +2,9 @@
 <script setup>
 import { RouterLink } from 'vue-router';
 import { ref, onMounted, onUnmounted } from 'vue';
+import { interests } from '@/services/interestService';
 
-const words = [
-  'DANS?',
-  'KERAMIK?',
-  'KUNST?',
-  'MUSIK?',
-  'TEATER?',
-  'FOTOGRAFI?',
-  'FILM?',
-  'LITTERATUR?',
-  'DESIGN?',
-];
+const words = interests.map((interest) => `${interest.label.toLocaleUpperCase('da-DK')}?`);
 
 const currentIndex = ref(0);
 

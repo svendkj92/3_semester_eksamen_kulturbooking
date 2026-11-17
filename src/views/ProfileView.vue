@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { getUserProfile, updateUserInterests, updateUserProfile } from '@/services/userService';
+import { interests as interestOptions } from '@/services/interestService';
 
 const user = shallowRef(null);
 const profile = ref(null);
@@ -134,7 +135,11 @@ function addInterest() {
   editError.value = '';
   const interest = newInterest.value.trim();
   if (!interest) {
-    editError.value = 'Skriv en interesse, før du tilføjer den.';
+    editError.value = 'Vælg en interesse, før du tilføjer den.';
+    return;
+  }
+  if (!interestOptions.some((option) => option.value === interest)) {
+    editError.value = 'Vælg en interesse fra listen.';
     return;
   }
   if (draftInterests.value.some((item) => item.toLocaleLowerCase('da') === interest.toLocaleLowerCase('da'))) {
@@ -152,7 +157,7 @@ async function saveInterests() {
     return;
   }
   if (newInterest.value.trim()) {
-    editError.value = 'Tilføj den indtastede interesse eller ryd feltet, før du gemmer.';
+    editError.value = 'Tilføj den valgte interesse eller ryd feltet, før du gemmer.';
     return;
   }
   const id = requestId;
@@ -299,13 +304,17 @@ onUnmounted(() => {
                 </li>
               </ul>
               <label for="new-interest">Ny interesse</label>
-              <input
+              <select
                 id="new-interest"
                 v-model="newInterest"
-                type="text"
                 :aria-invalid="Boolean(editError)"
                 :aria-describedby="editError ? 'interest-error' : undefined"
-              />
+              >
+                <option value="">Vælg en interesse</option>
+                <option v-for="interest in interestOptions" :key="interest.value" :value="interest.value">
+                  {{ interest.label }}
+                </option>
+              </select>
               <button class="action-button secondary-button" type="submit">Tilføj</button>
               <p v-if="editError" id="interest-error" class="error-message" role="alert">{{ editError }}</p>
               <div class="editor-actions">
