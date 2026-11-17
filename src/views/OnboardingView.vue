@@ -6,6 +6,7 @@ import {
   observeAuthState
 } from '@/services/authService'
 import { reload } from 'firebase/auth'
+import { getUserProfile } from '@/services/userService'
 import { auth } from '@/services/firebase'
 import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
@@ -36,6 +37,8 @@ const signupError = ref('')
 const verificationEmailSent = ref(false)
 const registeredUser = ref(null)
 const isCheckingVerification = ref(false)
+const isCheckingProfile = ref(false)
+const hasExistingProfile = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
 const selectedRole = ref('')
@@ -43,6 +46,28 @@ const selectedInterests = ref([])
 const profileBio = ref('')
 const profileImage = ref(null)
 let unsubscribeAuth = null
+
+async function checkProfileStatus(user) {
+  isCheckingProfile.value = true
+  hasExistingProfile.value = false
+
+  try {
+    const profile = await getUserProfile(user.uid)
+
+    if (auth.currentUser?.uid !== user.uid) return
+
+    hasExistingProfile.value = profile !== null
+    isOnboardingOpen.value = profile === null
+  } catch (error) {
+    console.error('Profile check failed:', error)
+
+    isOnboardingOpen.value = false
+    signupError.value =
+      'Vi kunne ikke hente din profil. Prøv igen senere.'
+  } finally {
+    isCheckingProfile.value = false
+  }
+}
 
 onMounted(() => {
   unsubscribeAuth = observeAuthState((user) => {
@@ -54,6 +79,9 @@ onMounted(() => {
       registeredUser.value = user
       email.value = user.email || ''
       emailVerified.value = user.emailVerified
+      if (user.emailVerified) {
+        void checkProfileStatus(user)
+      }
     } else {
       registeredUser.value = null
       emailVerified.value = false
@@ -149,6 +177,7 @@ async function checkEmailVerification() {
 
     if (user.emailVerified) {
       emailVerified.value = true
+      await checkProfileStatus(user)
     } else {
       signupError.value = 'Din e-mail er endnu ikke bekræftet. Tjek din indbakke.'
     }
@@ -324,7 +353,7 @@ function finishOnboarding() {
         </form>
 
         <div 
-          v-if="emailVerified && isOnboardingOpen"
+          v-if="emailVerified && !hasExistingProfile && !isCheckingProfile && isOnboardingOpen"
           class="onboarding-overlay">
 
           <button
