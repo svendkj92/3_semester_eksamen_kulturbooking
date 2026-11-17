@@ -30,6 +30,7 @@ const emailVerified = ref(false)
 const isSigningUp = ref(false)
 const signupError = ref('')
 const verificationEmailSent = ref(false)
+const registeredUser = ref(null)
 const isCheckingVerification = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
@@ -52,6 +53,7 @@ async function handleSignup() {
       email.value.trim(),
       password.value
     )
+    registeredUser.value = user
 
     await sendVerificationEmail(user)
 
@@ -60,8 +62,34 @@ async function handleSignup() {
   } catch (error) {
     console.error('Signup failed:', error.code || error.message)
 
+   if (registeredUser.value) {
+  signupError.value =
+    'Din konto er oprettet, men vi kunne ikke sende bekræftelsesmailen. Prøv at sende den igen.'
+  } else {
+  signupError.value =
+    'Registreringen kunne ikke gennemføres. Prøv igen.'
+  }
+  } finally {
+    isSigningUp.value = false
+  }
+}
+
+async function resendVerificationEmail() {
+  if (!registeredUser.value || isSigningUp.value) return
+
+  isSigningUp.value = true
+  signupError.value = ''
+
+  try {
+    await sendVerificationEmail(registeredUser.value)
+
+    verificationEmailSent.value = true
+    password.value = ''
+  } catch (error) {
+    console.error('Verification email failed:', error)
+
     signupError.value =
-      'Registreringen kunne ikke gennemføres. Prøv igen eller kontakt os.'
+      'Vi kunne ikke sende bekræftelsesmailen. Prøv igen senere.'
   } finally {
     isSigningUp.value = false
   }
@@ -164,11 +192,19 @@ function finishOnboarding() {
                  'input-error': emailTouched && email && !isEmailValid
                  }"
               />
-               <p
-                 v-if="emailTouched && email && !isEmailValid"
-                 class="email-error">
-                 Indtast venligst en gyldig e-mailadresse.
+              <p
+                v-if="emailTouched && email && !isEmailValid"
+                class="email-error">
+                Indtast venligst en gyldig e-mailadresse.
               </p>
+              <button
+                v-if="registeredUser && !verificationEmailSent"
+                type="button"
+                :disabled="isSigningUp"
+                @click="resendVerificationEmail"
+              >
+                Send bekræftelsesmail igen
+              </button>
               <div class="password-field">
                  <label for="password">Adgangskode</label>
                  <input
