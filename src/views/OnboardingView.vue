@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   registerUser,
   sendVerificationEmail,
@@ -15,6 +16,7 @@ import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
+const router = useRouter()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -214,8 +216,37 @@ function closeOnboarding() {
   isOnboardingOpen.value = false
 }
 
-function finishOnboarding() {
-  closeOnboarding()
+async function finishOnboarding() {
+  if (isSavingProfile.value || hasExistingProfile.value) return
+
+  const user = auth.currentUser
+
+  if (!user || !user.emailVerified) {
+    profileSaveError.value = 'Du skal bekræfte din e-mail først.'
+    return
+  }
+
+  isSavingProfile.value = true
+  profileSaveError.value = ''
+
+  try {
+    await createUserProfile(user, selectedInterests.value, {
+      role: selectedRole.value || 'udforsker',
+      bio: profileBio.value.trim()
+    })
+
+    hasExistingProfile.value = true
+    isOnboardingOpen.value = false
+
+    await router.push('/profile')
+  } catch (error) {
+    console.error('Profile save failed:', error)
+
+    profileSaveError.value =
+      'Vi kunne ikke gemme din profil. Prøv igen.'
+  } finally {
+    isSavingProfile.value = false
+  }
 }
 
 </script>
@@ -388,25 +419,35 @@ function finishOnboarding() {
           />
 
           <div class="onboarding-navigation">
+            
             <button
               v-if="currentStep > 1"
               @click="previousStep"
             >
               Tilbage
             </button>
+
             <button
               v-if="currentStep < 3"
               @click="nextStep"
             >
               Næste
             </button>
+
             <button
               v-if="currentStep === 3"
               @click="finishOnboarding"
               type="button"
+              :disabled="isSavingProfile"
             >
-              Afslut
+              {{ isSavingProfile ? 'Gemmer profil...' : 'Afslut' }}
             </button>
+
+            <p v-if="profileSaveError" 
+            class="email-error" 
+            role="alert">
+              {{ profileSaveError }}
+            </p>
           </div>
         </div>
     </section>
