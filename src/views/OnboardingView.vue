@@ -107,7 +107,11 @@ async function handleSignup() {
 }
 
 async function resendVerificationEmail() {
-  if (!registeredUser.value || isSigningUp.value) return
+  if (
+    !registeredUser.value ||
+    isSigningUp.value ||
+    emailVerified.value
+  ) return
 
   isSigningUp.value = true
   signupError.value = ''
@@ -282,8 +286,17 @@ function finishOnboarding() {
             {{ signupError }}
           </p>
 
+          <p
+           v-if="verificationEmailSent && !emailVerified"
+           class="email-success"
+           role="status"
+          >
+           En bekræftelsesmail er sendt til {{ email }}.
+           Tjek din indbakke for at bekræfte din e-mailadresse.
+          </p>
+
           <button
-            v-if="registeredUser && !verificationEmailSent"
+            v-if="registeredUser && !emailVerified"
             type="button"
             @click="resendVerificationEmail"
             :disabled="isSigningUp"
