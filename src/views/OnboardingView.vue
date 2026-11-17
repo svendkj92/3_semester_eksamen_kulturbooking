@@ -215,6 +215,7 @@ function finishOnboarding() {
                 :disabled="isCheckingVerification"
               >
                 {{ isCheckingVerification ? 'Kontrollerer...' : 'Jeg har bekræftet min e-mail' }}
+              </button>
          </form>
 
           <div 
