@@ -74,8 +74,7 @@ function finishOnboarding() {
          <div class="divider">
              <span>Eller</span>
          </div>
-         <form class="email-login" novalidate>
-             <label for="email">E-mail</label>
+         <form class="email-login" novalidate>  
              <div class="name-field">
                 <label for="name">Navn</label>
                   <input
@@ -87,6 +86,7 @@ function finishOnboarding() {
                     required
                   />
              </div>
+             <label for="email">E-mail</label>
              <input
                  id="email"
                  v-model="email"
