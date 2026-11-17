@@ -40,8 +40,13 @@ const profileBio = ref('')
 const profileImage = ref(null)
 
 async function handleSignup() {
-  if (!isFormValid.value || isSigningUp.value || verificationEmailSent.value) {
-    return
+  if (
+  !isFormValid.value ||
+  isSigningUp.value ||
+  registeredUser.value ||
+  verificationEmailSent.value
+  ) {
+  return
   }
 
   isSigningUp.value = true
@@ -152,161 +157,181 @@ function finishOnboarding() {
 
 <template>
   <div class="signup-page">
+    
      <section class="signup-content">
-         <h1>Velkommen til KulturBooking!</h1>
 
-         <div class="social-login">
-             <button type="button">
-                 Fortsæt med Apple
-             </button>
+        <h1>Velkommen til KulturBooking!</h1>
 
-             <button type="button">
-                 Fortsæt med Google
-             </button>
-         </div>
+        <div class="social-login">
 
-         <div class="divider">
-             <span>Eller</span>
-         </div>
-         <form class="email-login" novalidate @submit.prevent="handleSignup">
-             <div class="name-field">
-                <label for="name">Navn</label>
-                  <input
-                    id="name"
-                    v-model="name"
-                    type="text"
-                    autocomplete="name"
-                    placeholder="Indtast dit navn"
-                    required
-                  />
-             </div>
-             <label for="email">E-mail</label>
-             <input
-                 id="email"
-                 v-model="email"
-                 type="email"
-                 autocomplete="email"
-                 placeholder="Indtast din e-mailadresse"
-                 @blur="emailTouched = true"
-                 :class="{
-                 'input-error': emailTouched && email && !isEmailValid
-                 }"
-              />
-              <p
-                v-if="emailTouched && email && !isEmailValid"
-                class="email-error">
-                Indtast venligst en gyldig e-mailadresse.
-              </p>
-              <button
-                v-if="registeredUser && !verificationEmailSent"
-                type="button"
-                :disabled="isSigningUp"
-                @click="resendVerificationEmail"
-              >
-                Send bekræftelsesmail igen
-              </button>
-              <div class="password-field">
-                 <label for="password">Adgangskode</label>
-                 <input
-                    id="password"
-                    v-model="password"
-                    type="password"
-                    autocomplete="new-password"
-                    placeholder="Opret en adgangskode"
-                    minlength="6"
-                    required
-                    @blur="passwordTouched = true"
-                    :class="{ 'input-error': passwordTouched && !isPasswordValid && !verificationEmailSent }"
-                  />
-                  <p
-                    v-if="passwordTouched && !isPasswordValid && !verificationEmailSent"
-                    class="email-error">
-                    Adgangskoden skal være mindst 6 tegn lang.
-                  </p>
-              </div>
+          <button type="button">
+            Fortsæt med Apple
+          </button>
 
-             <p class="privacy-policy">
-                 Ved at fortsætte accepterer du vores
-                 <a href="#">Privatlivspolitik</a>.
-             </p>
+          <button type="button">
+            Fortsæt med Google
+          </button>
 
-             <button
-                type="submit"
-                :disabled="!isFormValid || isSigningUp || verificationEmailSent"
-             >
-                {{ isSigningUp ? 'Opretter konto...' : 'Opret konto' }}
-             </button>
+        </div>
 
-             <p v-if="signupError" class="email-error" role="alert">
-                 {{ signupError }}
-             </p>
+        <div class="divider">
+          <span>Eller</span>
+        </div>
 
-             <p v-if="verificationEmailSent" class="email-success">
-                En bekræftelsesmail er sendt til {{ email }}. Tjek din indbakke for at bekræfte din e-mailadresse.
-             </p>
-             <button
-                v-if="verificationEmailSent && !emailVerified"
-                type="button"
-                @click="checkEmailVerification"
-                :disabled="isCheckingVerification"
-              >
-                {{ isCheckingVerification ? 'Kontrollerer...' : 'Jeg har bekræftet min e-mail' }}
-              </button>
-         </form>
+        <form class="email-login" novalidate @submit.prevent="handleSignup">
 
-          <div 
-            v-if="emailVerified && isOnboardingOpen"
-            class="onboarding-overlay">
+          <div class="name-field">
 
-             <button
-               type="button"
-               aria-label="Luk onboarding"
-               @click="closeOnboarding"
-             >
-                 x
-             </button>
+            <label for="name">Navn</label>
 
-             <p class="onboarding-progress">
-                 Trin  {{ currentStep }} af 3
-             </p>
+            <input
+              id="name"
+              v-model="name"
+              type="text"
+              autocomplete="name"
+              placeholder="Indtast dit navn"
+              required
+            />
 
-             <OnboardingRoleSelection 
-                 v-if="currentStep === 1"
-                 v-model="selectedRole"
-                />
-             <OnboardingInterestSelection 
-                 v-else-if="currentStep === 2" 
-                 v-model="selectedInterests"
-                 />
-             <OnboardingProfileSetup 
-                 v-else-if="currentStep === 3" 
-                 v-model:bio="profileBio"
-                 v-model:image="profileImage"
-                />
-
-             <div class="onboarding-navigation">
-                    <button
-                        v-if="currentStep > 1"
-                        @click="previousStep"
-                    >
-                        Tilbage
-                    </button>
-                    <button
-                        v-if="currentStep < 3"
-                        @click="nextStep"
-                    >
-                        Næste
-                    </button>
-                    <button
-                        v-if="currentStep === 3"
-                        @click="finishOnboarding"
-                        type="button"
-                    >
-                        Afslut
-                    </button>
-             </div>
           </div>
-     </section>
+
+          <label for="email">E-mail</label>
+
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            autocomplete="email"
+            placeholder="Indtast din e-mailadresse"
+            @blur="emailTouched = true"
+            :class="{
+            'input-error': emailTouched && email && !isEmailValid
+            }"
+          />
+
+          <p
+            v-if="emailTouched && email && !isEmailValid"
+            class="email-error">
+            Indtast venligst en gyldig e-mailadresse.
+          </p>
+              
+          <div class="password-field">
+
+            <label for="password">Adgangskode</label>
+
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              autocomplete="new-password"
+              placeholder="Opret en adgangskode"
+              minlength="6"
+              required
+              @blur="passwordTouched = true"
+              :class="{ 'input-error': passwordTouched && !isPasswordValid && !verificationEmailSent }"
+            />
+
+            <p
+              v-if="passwordTouched && !isPasswordValid && !verificationEmailSent"
+              class="email-error">
+              Adgangskoden skal være mindst 6 tegn lang.
+            </p>
+
+          </div>
+
+          <p class="privacy-policy">
+            Ved at fortsætte accepterer du vores
+            <a href="#">Privatlivspolitik</a>.
+          </p>
+
+          <button
+            type="submit"
+            :disabled="!isFormValid || isSigningUp || registeredUser || verificationEmailSent"
+          >
+           {{ isSigningUp ? 'Opretter konto...' : 'Opret konto' }}
+          </button>
+
+          <p v-if="signupError" class="email-error" role="alert">
+            {{ signupError }}
+          </p>
+
+          <button
+            v-if="registeredUser && !verificationEmailSent"
+            type="button"
+            @click="resendVerificationEmail"
+            :disabled="isSigningUp"
+          >
+            Send bekræftelsesmail igen
+          </button>
+
+          <p v-if="verificationEmailSent" class="email-success">
+            En bekræftelsesmail er sendt til {{ email }}. Tjek din indbakke for at bekræfte din e-mailadresse.
+          </p>
+
+          <button
+            v-if="verificationEmailSent && !emailVerified"
+            type="button"
+            @click="checkEmailVerification"
+            :disabled="isCheckingVerification"
+          >
+            {{ isCheckingVerification ? 'Kontrollerer...' : 'Jeg har bekræftet min e-mail' }}
+          </button>
+
+        </form>
+
+        <div 
+          v-if="emailVerified && isOnboardingOpen"
+          class="onboarding-overlay">
+
+          <button
+            type="button"
+            aria-label="Luk onboarding"
+            @click="closeOnboarding"
+          >
+            x
+          </button>
+
+          <p class="onboarding-progress">
+            Trin  {{ currentStep }} af 3
+          </p>
+
+          <OnboardingRoleSelection 
+            v-if="currentStep === 1"
+            v-model="selectedRole"
+          />
+          <OnboardingInterestSelection 
+            v-else-if="currentStep === 2" 
+            v-model="selectedInterests"
+          />
+          <OnboardingProfileSetup 
+            v-else-if="currentStep === 3" 
+            v-model:bio="profileBio"
+            v-model:image="profileImage"
+          />
+
+          <div class="onboarding-navigation">
+            <button
+              v-if="currentStep > 1"
+              @click="previousStep"
+            >
+              Tilbage
+            </button>
+            <button
+              v-if="currentStep < 3"
+              @click="nextStep"
+            >
+              Næste
+            </button>
+            <button
+              v-if="currentStep === 3"
+              @click="finishOnboarding"
+              type="button"
+            >
+              Afslut
+            </button>
+          </div>
+        </div>
+    </section>
   </div>
 </template>
 
