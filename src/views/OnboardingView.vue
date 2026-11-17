@@ -5,16 +5,11 @@ import OnboardingInterestSelection from '@/components/OnboardingInterestSelectio
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
 const email = ref('')
-const codeSent = ref(false)
+const password = ref('')
 const emailTouched = ref(false)
 const isEmailValid = computed(() => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)
 })
-const verificationCode = ref('')
-const isCodeNumeric = computed(() => {
-  return /^[0-9]+$/.test(verificationCode.value)
-})
-const codeError = ref('')
 const emailVerified = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
@@ -85,21 +80,20 @@ function finishOnboarding() {
                  class="email-error">
                  Indtast venligst en gyldig e-mailadresse.
               </p>
-              <div v-if="codeSent" class="verification-code">
-                 <label for="verification-code">Bekræftelseskoden</label>
+              <div class="password-field">
+                 <label for="password">Adgangskode</label>
                  <input
-                     id="verification-code"
-                     v-model="verificationCode"
-                     type="text"
-                     inputmode="numeric"
-                     autocomplete="one-time-code"
-                     placeholder="Indtast bekræftelseskoden"
-                   />
-                   <p v-if="codeError" class="code-error" role="alert">
-                     {{ codeError }}
-                   </p>
-             </div>
-             <p v-if="codeSent" class="privacy-policy">
+                     id="password"
+                     v-model="password"
+                     type="password"
+                     autocomplete="new-password"
+                     placeholder="Opret en adgangskode"
+                     minlength="6"
+                     required
+                  />
+              </div>
+
+             <p class="privacy-policy">
                  Ved at fortsætte accepterer du vores
                  <a href="#">Privatlivspolitik</a>.
              </p>
@@ -219,10 +213,6 @@ function finishOnboarding() {
 }
 .email-success {
   color: #166534;
-}
-
-.code-error {
-  color: #DC2626;
 }
 
 </style>
