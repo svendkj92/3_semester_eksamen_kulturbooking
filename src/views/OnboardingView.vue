@@ -6,7 +6,10 @@ import {
   observeAuthState
 } from '@/services/authService'
 import { reload } from 'firebase/auth'
-import { getUserProfile } from '@/services/userService'
+import {
+  getUserProfile,
+  createUserProfile
+} from '@/services/userService'
 import { auth } from '@/services/firebase'
 import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
@@ -45,6 +48,8 @@ const selectedRole = ref('')
 const selectedInterests = ref([])
 const profileBio = ref('')
 const profileImage = ref(null)
+const isSavingProfile = ref(false)
+const profileSaveError = ref('')
 let unsubscribeAuth = null
 
 async function checkProfileStatus(user) {
@@ -361,7 +366,7 @@ function finishOnboarding() {
             aria-label="Luk onboarding"
             @click="closeOnboarding"
           >
-            x
+           x
           </button>
 
           <p class="onboarding-progress">

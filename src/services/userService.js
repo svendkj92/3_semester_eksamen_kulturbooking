@@ -10,13 +10,16 @@ import {
 import { db } from './firebase';
 
 // Create a user profile
-export async function createUserProfile(user, interests) {
+export async function createUserProfile(user, interests, onboardingData = {}) {
   const userRef = ref(db, `users/${user.uid}`);
 
   const userData = {
     profile: {
       displayName: user.displayName,
       email: user.email,
+      role: onboardingData.role || 'udforsker',
+      bio: onboardingData.bio || '',
+      profileImage: '',
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     },
@@ -34,6 +37,12 @@ export async function createUserProfile(user, interests) {
 // Get a user profile
 export async function getUserProfile(uid) {
   const userRef = ref(db, `users/${uid}`);
+
+  const snapshot = await get(userRef);
+
+  if (snapshot.exists()) {
+    throw new Error('User profile already exists');
+  }
 
   const snapshot = await get(userRef);
 
