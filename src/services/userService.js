@@ -13,6 +13,12 @@ import { db } from './firebase';
 export async function createUserProfile(user, interests, onboardingData = {}) {
   const userRef = ref(db, `users/${user.uid}`);
 
+  const snapshot = await get(userRef);
+
+  if (snapshot.exists()) {
+    throw new Error('User profile already exists');
+  }
+
   const userData = {
     profile: {
       displayName: user.displayName,
@@ -37,12 +43,6 @@ export async function createUserProfile(user, interests, onboardingData = {}) {
 // Get a user profile
 export async function getUserProfile(uid) {
   const userRef = ref(db, `users/${uid}`);
-
-  const snapshot = await get(userRef);
-
-  if (snapshot.exists()) {
-    throw new Error('User profile already exists');
-  }
 
   const snapshot = await get(userRef);
 
