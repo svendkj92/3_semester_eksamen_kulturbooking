@@ -1,6 +1,8 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { registerUser, sendVerificationEmail } from '@/services/authService'
+import { reload } from 'firebase/auth'
+import { auth } from '@/services/firebase'
 import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
@@ -28,6 +30,7 @@ const emailVerified = ref(false)
 const isSigningUp = ref(false)
 const signupError = ref('')
 const verificationEmailSent = ref(false)
+const isCheckingVerification = ref(false)
 const currentStep = ref(1)
 const isOnboardingOpen = ref(true)
 const selectedRole = ref('')
@@ -61,6 +64,35 @@ async function handleSignup() {
       'Registreringen kunne ikke gennemføres. Prøv igen eller kontakt os.'
   } finally {
     isSigningUp.value = false
+  }
+}
+
+async function checkEmailVerification() {
+  if (isCheckingVerification.value) return
+
+  isCheckingVerification.value = true
+  signupError.value = ''
+
+  try {
+    const user = auth.currentUser
+
+    if (!user) {
+      signupError.value = 'Du er ikke logget ind. Log ind igen for at fortsætte.'
+      return
+    }
+
+    await reload(user)
+
+    if (user.emailVerified) {
+      emailVerified.value = true
+    } else {
+      signupError.value = 'Din e-mail er endnu ikke bekræftet. Tjek din indbakke.'
+    }
+  } catch (error) {
+    console.error('Email verification check failed:', error)
+    signupError.value = 'Vi kunne ikke kontrollere din e-mail. Prøv igen.'
+  } finally {
+    isCheckingVerification.value = false
   }
 }
 
@@ -148,10 +180,10 @@ function finishOnboarding() {
                     minlength="6"
                     required
                     @blur="passwordTouched = true"
-                    :class="{ 'input-error': passwordTouched && password && !isPasswordValid }"
+                    :class="{ 'input-error': passwordTouched && !isPasswordValid && !verificationEmailSent }"
                   />
                   <p
-                    v-if="passwordTouched && password && !isPasswordValid"
+                    v-if="passwordTouched && !isPasswordValid && !verificationEmailSent"
                     class="email-error">
                     Adgangskoden skal være mindst 6 tegn lang.
                   </p>
@@ -176,6 +208,13 @@ function finishOnboarding() {
              <p v-if="verificationEmailSent" class="email-success">
                 En bekræftelsesmail er sendt til {{ email }}. Tjek din indbakke for at bekræfte din e-mailadresse.
              </p>
+             <button
+                v-if="verificationEmailSent && !emailVerified"
+                type="button"
+                @click="checkEmailVerification"
+                :disabled="isCheckingVerification"
+              >
+                {{ isCheckingVerification ? 'Kontrollerer...' : 'Jeg har bekræftet min e-mail' }}
          </form>
 
           <div 
