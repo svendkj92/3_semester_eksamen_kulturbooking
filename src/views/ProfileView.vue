@@ -4,6 +4,10 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { getUserProfile, updateUserInterests, updateUserProfile } from '@/services/userService';
 import { interests as interestOptions } from '@/services/interestService';
+import { RouterLink } from 'vue-router';
+import { getEvents } from '@/services/eventService';
+import { getRegistrations } from '@/services/registrationService';
+import { formatEventDate, formatEventTime } from '@/services/eventData';
 
 const user = shallowRef(null);
 const profile = ref(null);
@@ -24,12 +28,58 @@ const nameSaveMessage = ref('');
 const displayName = computed(() => profile.value?.displayName || user.value?.displayName || 'Min profil');
 let unsubscribe;
 let requestId = 0;
+let eventsRequestId = 0;
+let clock;
+const events = ref([]);
+const registrations = ref({});
+const eventsLoading = ref(false);
+const eventsError = ref('');
+const now = ref(Date.now());
 
-// Events afventer en aftalt Firebase-datastruktur.
-const eventSections = [
-  { id: 'recommended', title: 'Anbefalede events' },
-  { id: 'my-events', title: 'Mine events' },
-];
+const eventSections = computed(() => [
+  {
+    id: 'recommended',
+    title: 'Anbefalede events',
+    events: events.value.filter((event) => event.startsAt > now.value
+      && interests.value.includes(event.category) && !registrations.value[event.id]),
+    empty: interests.value.length
+      ? 'Der er ingen kommende events, der matcher dine interesser, og som du ikke allerede er tilmeldt.'
+      : 'Vælg interesser for at få anbefalet events.',
+  },
+  {
+    id: 'my-events',
+    title: 'Mine events',
+    events: events.value.filter((event) => registrations.value[event.id]),
+    empty: 'Du er ikke tilmeldt nogen events endnu.',
+  },
+]);
+
+const unavailableRegistrations = computed(() => Object.keys(registrations.value)
+  .filter((id) => !events.value.some((event) => event.id === id)).length);
+
+async function loadProfileEvents(authUser = user.value) {
+  const id = ++eventsRequestId;
+  events.value = [];
+  registrations.value = {};
+  eventsError.value = '';
+  eventsLoading.value = Boolean(authUser);
+  if (!authUser) return;
+  try {
+    const [eventData, registrationData] = await Promise.all([
+      getEvents(),
+      getRegistrations(authUser.uid),
+    ]);
+    if (id !== eventsRequestId) return;
+    events.value = eventData;
+    registrations.value = registrationData;
+  } catch {
+    if (id === eventsRequestId) {
+      eventsError.value = 'Events og tilmeldinger kunne ikke indlæses. Kontrollér forbindelsen og prøv igen.';
+    }
+  } finally {
+    if (id === eventsRequestId) eventsLoading.value = false;
+  }
+}
 
 async function loadProfile(authUser) {
   const id = ++requestId;
@@ -49,6 +99,7 @@ async function loadProfile(authUser) {
   nameError.value = '';
   nameSaveMessage.value = '';
   isLoading.value = Boolean(authUser);
+  void loadProfileEvents(authUser);
   if (!authUser) return;
 
   try {
@@ -181,8 +232,12 @@ async function saveInterests() {
 }
 
 onMounted(() => {
+  clock = setInterval(() => { now.value = Date.now(); }, 1000);
   unsubscribe = onAuthStateChanged(auth, loadProfile, () => {
     ++requestId;
+    ++eventsRequestId;
+    events.value = [];
+    registrations.value = {};
     user.value = null;
     profile.value = null;
     interests.value = [];
@@ -193,6 +248,8 @@ onMounted(() => {
 
 onUnmounted(() => {
   ++requestId;
+  ++eventsRequestId;
+  clearInterval(clock);
   unsubscribe?.();
 });
 </script>
@@ -338,8 +395,13 @@ onUnmounted(() => {
       </div>
 
       <div class="event-sections">
+        <p v-if="eventsLoading" role="status">Indlæser events og tilmeldinger…</p>
+        <div v-else-if="eventsError">
+          <p class="error-message" role="alert">{{ eventsError }}</p>
+          <button type="button" @click="loadProfileEvents()">Prøv igen</button>
+        </div>
         <section
-          v-for="section in eventSections"
+          v-for="section in (eventsLoading || eventsError ? [] : eventSections)"
           :key="section.id"
           class="events-section"
           :aria-labelledby="`${section.id}-heading`"
@@ -347,7 +409,27 @@ onUnmounted(() => {
           <div class="section-heading">
             <h2 :id="`${section.id}-heading`">{{ section.title }}</h2>
           </div>
-          <p class="empty-state">Events er endnu ikke tilkoblet.</p>
+          <ul v-if="section.events.length" class="event-grid">
+            <li v-for="event in section.events" :key="event.id">
+              <article class="event-card">
+                <img class="profile-event-image" :src="event.image" :alt="event.title" loading="lazy" />
+                <div class="event-content">
+                  <h3>{{ event.title }}</h3>
+                  <p>{{ event.category }}</p>
+                  <p>{{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}</p>
+                  <p>{{ event.location }}</p>
+                  <p v-if="event.startsAt <= now">Eventet er startet</p>
+                  <RouterLink :to="{ name: 'event-detail', params: { id: event.id } }">
+                    Se event<span class="visually-hidden">: {{ event.title }}</span>
+                  </RouterLink>
+                </div>
+              </article>
+            </li>
+          </ul>
+          <p v-else class="empty-state">{{ section.empty }}</p>
+          <p v-if="section.id === 'my-events' && unavailableRegistrations" role="status">
+            {{ unavailableRegistrations }} af dine tilmeldte events er ikke længere tilgængelige.
+          </p>
         </section>
       </div>
     </div>
@@ -580,6 +662,25 @@ onUnmounted(() => {
   overflow: hidden;
   border: 1px solid rgba($primary-color, 0.2);
   border-radius: 8px;
+}
+
+.profile-event-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.event-content a {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: $primary-color;
+  text-decoration: underline;
+
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 3px;
+  }
 }
 
 .event-image {

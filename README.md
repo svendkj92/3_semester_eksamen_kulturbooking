@@ -36,3 +36,58 @@ npm run dev
 ```sh
 npm run build
 ```
+
+## Firebase events og tilmeldinger (MVP)
+
+Der er ingen betalingsfunktion. `price` er kun information.
+
+- `events/<eventId>` indeholder titel, kategori, `startsAt` (Unix-tid i millisekunder),
+  sted, pris, beskrivelse og billede.
+- `users/<uid>` bevarer den eksisterende profil og interesser.
+- `registrations/<uid>/<eventId>/registeredAt` indeholder et Firebase-serverstempel.
+  Afmelding fjerner kun den konkrete tilmelding. Gentagen tilmelding opretter ikke dubletter.
+- Events kan laeses offentligt, men ikke skrives fra appen. Brugere kan kun laese og
+  aendre egne tilmeldinger. Serverreglerne afviser ny tilmelding fra eventets start.
+  Afmelding er fortsat mulig efter start.
+
+### Opsaetning i Firebase Console
+
+1. Eksporter en backup fra Realtime Database, foer du aendrer databasen.
+2. Vaelg **Realtime Database > Data** og opret/vaelg noden **events**.
+   Importer [firebase/events.json](firebase/events.json) **under `/events`, aldrig ved roden**.
+   Import erstatter indholdet af den valgte node, saa bevar eventuelle eksisterende
+   events, hvis der allerede ligger data der. Filen indeholder de fire demo-events
+   med samme ID'er som tidligere og datoer i januar 2027.
+3. Under **Rules**: sammenhold de eksisterende regler med
+   [firebase/database.rules.json](firebase/database.rules.json), og publicer dem.
+   Filen bevarer de oplyste `users`- og `events`-regler og tilfoejer `registrations`.
+   Bevar andre regler, hvis teamet har tilfoejet nogen siden.
+4. Opret ikke tomme tilmeldinger manuelt. `registrations` oprettes automatisk ved
+   foerste tilmelding. `registeredAt` skrives af appen med `serverTimestamp()`.
+
+Demoernes `imageKey` henviser til de fire eksisterende billeder i appen. Et event kan
+i stedet have `imageUrl` med en offentlig HTTP(S)-adresse eller en sti i appen.
+Dato og klokkeslaet vises altid i tidszonen `Europe/Copenhagen`.
+Der er ingen lokal fallback: tom database og afvist adgang vises eksplicit i UI.
+
+### Kontrol
+
+```sh
+node --test src/services/eventData.test.js
+npm run build
+```
+
+Efter import og publicering af regler:
+
+1. Aabn `/events` uden login: fire januar-events og detaljer skal kunne ses.
+2. Log ind med en testbruger med profil. Tilmeld et kommende event, genindlaes siden,
+   og kontroller, at knappen viser **Afmeld event**.
+3. Kontroller tilmeldingen under `/profile` > **Mine events**. Interesser matcher
+   kommende events i **Anbefalede events**; allerede tilmeldte events udelades.
+4. Afmeld via detaljesiden. Tilmeldingen skal forsvinde fra **Mine events**.
+5. Brug Firebase Rules Playground til at kontrollere, at ingen kan laese/skrive en
+   anden brugers tilmeldinger, og at manglende/allerede startede events afvises.
+   Kun egen afmelding skal stadig vaere tilladt efter start.
+
+Firebase Console-opsaetning og disse live-tests skal gennemfoeres separat; et
+godkendt build verificerer ikke de publicerede databaseregler.

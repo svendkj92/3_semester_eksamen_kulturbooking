@@ -1,9 +1,32 @@
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import { interests } from '@/services/interestService';
-import { events } from '@/services/eventService';
+import { getEvents } from '@/services/eventService';
+import { formatEventDate, formatEventTime } from '@/services/eventData';
+
+const events = ref([]);
+const isLoading = ref(true);
+const loadError = ref('');
+let requestId = 0;
+
+async function loadEvents() {
+  const id = ++requestId;
+  isLoading.value = true;
+  loadError.value = '';
+  try {
+    const data = await getEvents();
+    if (id === requestId) events.value = data;
+  } catch {
+    if (id === requestId) loadError.value = 'Events kunne ikke indlæses. Kontrollér forbindelsen og prøv igen.';
+  } finally {
+    if (id === requestId) isLoading.value = false;
+  }
+}
+
+onMounted(loadEvents);
+onUnmounted(() => { ++requestId; });
 
 const searchQuery = ref('');
 const selectedCategory = ref('Alle');
@@ -11,7 +34,7 @@ const selectedCategory = ref('Alle');
 const categories = ['Alle', ...interests.map((interest) => interest.value)];
 
 const filteredEvents = computed(() => {
-  return events
+  return events.value
     .filter((event) => {
       const matchesCategory =
         selectedCategory.value === 'Alle' ||
@@ -23,15 +46,8 @@ const filteredEvents = computed(() => {
 
       return matchesCategory && matchesSearch;
     })
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
+    .sort((a, b) => a.startsAt - b.startsAt);
 });
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('da-DK', {
-    day: '2-digit',
-    month: 'long',
-  });
-};
 </script>
 
 <template>
@@ -42,9 +58,15 @@ const formatDate = (date) => {
 
       <div class="events-section__header">
         <h1>Udforsk events</h1>
-        <p class="events-count">
+        <p v-if="!isLoading && !loadError" class="events-count">
           {{ filteredEvents.length }} events
         </p>
+      </div>
+
+      <p v-if="isLoading" role="status">Indlæser events…</p>
+      <div v-else-if="loadError">
+        <p role="alert">{{ loadError }}</p>
+        <button type="button" @click="loadEvents">Prøv igen</button>
       </div>
 
       <!-- Category filters -->
@@ -64,7 +86,7 @@ const formatDate = (date) => {
       </div>
 
       <!-- Event cards -->
-      <div class="events-container">
+      <div v-if="!isLoading && !loadError" class="events-container">
 
         <div
           v-for="event in filteredEvents"
@@ -90,7 +112,7 @@ const formatDate = (date) => {
           <div class="event-card__content">
             <h3>{{ event.title }}</h3>
             <div class="event-card__meta">
-              <span>{{ formatDate(event.date) }} kl.{{ event.time }}</span>
+              <span>{{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}</span>
               <span>{{ event.location }}</span>
             </div>
 
@@ -108,7 +130,7 @@ const formatDate = (date) => {
 
       <!-- Empty state -->
       <div
-        v-if="filteredEvents.length === 0"
+        v-if="!isLoading && !loadError && filteredEvents.length === 0"
         class="events-empty"
       >
         <h3>Ingen events fundet</h3>

@@ -1,0 +1,29 @@
+{
+  "rules": {
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "events": {
+      ".read": true,
+      ".write": false
+    },
+    "registrations": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$eventId": {
+          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || (!data.exists() && root.child('events').child($eventId).child('startsAt').isNumber() && root.child('events').child($eventId).child('startsAt').val() > now))",
+          ".validate": "newData.hasChildren(['registeredAt'])",
+          "registeredAt": {
+            ".validate": "newData.isNumber() && newData.val() === now"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
+    }
+  }
+}

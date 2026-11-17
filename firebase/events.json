@@ -1,0 +1,38 @@
+{
+  "1": {
+    "title": "Jazz Jam",
+    "category": "Musik",
+    "startsAt": 1800036000000,
+    "location": "Kulturmaskinen, Odense",
+    "price": "Gratis",
+    "imageKey": "jazz",
+    "description": "Oplev en stemningsfuld aften med live jazz og nye musikalske talenter."
+  },
+  "2": {
+    "title": "Hip hop danseworkshop",
+    "category": "Dans",
+    "startsAt": 1799771400000,
+    "location": "Dansens Hus, Odense",
+    "price": "Gratis",
+    "imageKey": "dance",
+    "description": "En uformel danseworkshop, hvor alle kan være med."
+  },
+  "3": {
+    "title": "Teater i øjenhøjde",
+    "category": "Teater",
+    "startsAt": 1799865000000,
+    "location": "Teater Momentum",
+    "price": "150 ,-",
+    "imageKey": "theatre",
+    "description": "Oplev moderne teater og mød nye mennesker."
+  },
+  "4": {
+    "title": "Design workshop",
+    "category": "Design",
+    "startsAt": 1801227600000,
+    "location": "Kulturmaskinen, Odense",
+    "price": "Gratis",
+    "imageKey": "design",
+    "description": "En workshop for dig, der elsker at udvikle kreative idéer."
+  }
+}
