@@ -21,6 +21,7 @@ const route = useRoute()
 const name = ref('')
 const email = ref('')
 const password = ref('')
+const nameTouched = ref(false)
 const emailTouched = ref(false)
 const passwordTouched = ref(false)
 const isEmailValid = computed(() => {
@@ -291,7 +292,15 @@ async function finishOnboarding() {
               autocomplete="name"
               placeholder="Indtast dit navn"
               required
+              @blur="nameTouched = true"
+              :class="{ 'input-error': nameTouched && !isNameValid }"
             />
+
+            <p
+              v-if="nameTouched && !isNameValid"
+              class="email-error">
+              Indtast venligst dit navn.
+            </p>
 
           </div>
 
