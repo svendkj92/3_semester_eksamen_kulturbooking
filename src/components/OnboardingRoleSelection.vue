@@ -37,7 +37,7 @@ const roles = [
            :value="role.value"
             />
 
-         <span>{{ role.label }}</span>
+         <p class="role-description">{{ role.description }}</p>
         
         </label>
     </div>
