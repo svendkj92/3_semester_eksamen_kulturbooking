@@ -1,0 +1,33 @@
+@use './variables' as *;
+
+// Main page headings
+@mixin page-title {
+  font-family: $font-heading;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-title;
+}
+
+// Section headings and subtitles
+@mixin section-title {
+  font-family: $font-body;
+  font-size: $font-size-subtitle;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-subtitle;
+}
+
+// Body text
+@mixin body-text {
+  font-family: $font-body;
+  font-size: $font-size-body;
+  font-weight: $font-weight-regular;
+  line-height: $line-height-body;
+}
+
+// Keyboard focus indicator
+@mixin focus-ring {
+  outline: none;
+  box-shadow:
+    0 0 0 $focus-ring-inner $focus-ring-inner-color,
+    0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
+}

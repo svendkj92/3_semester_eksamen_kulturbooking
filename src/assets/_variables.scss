@@ -8,3 +8,66 @@ $secondary-color: #64748B; //Secondary text, captions, and inactive icons
 $hero-text-color: #0F172A; //Body text, dark cards, and hero overlays
 $error-color: #DC2626; //Error messages, form validation, and error states
 $success-color: #166534; //Successful actions and feedback
+
+// Typography
+$font-heading: 'Antonio', sans-serif;
+$font-body: 'Inter', sans-serif;
+
+$font-size-title: 30px;
+$font-size-subtitle: 24px;
+$font-size-body: 16px;
+
+$line-height-title: 36px;
+$line-height-subtitle: 31.2px;
+$line-height-body: 24px;
+
+$font-weight-regular: 400;
+$font-weight-bold: 700;
+
+// Spacing
+$space-1: 4px;
+$space-2: 8px;
+$space-3: 16px;
+$space-4: 24px;
+$space-5: 32px;
+$space-6: 48px;
+$space-7: 64px;
+
+// Border radius
+$radius-input: 4px;
+$radius-button: 4px;
+$radius-card: 8px;
+
+// Layout
+$container-max-width: 1200px;
+
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+$breakpoint-large-desktop: 1440px;
+
+// Grid system
+$grid-columns-mobile: 4;
+$grid-columns-tablet: 8;
+$grid-columns-desktop: 12;
+
+$grid-gap: 24px;
+
+// Page margins
+$page-margin-mobile: 16px;
+$page-margin-tablet: 32px;
+$page-margin-desktop: 64px;
+
+// Component dimensions
+$border-width-input: 1px;
+$min-touch-target: 44px;
+$icon-size: 24px;
+
+// Focus ring
+$focus-ring-inner: 2px;
+$focus-ring-outer: 2px;
+$focus-ring-inner-color: #FFFFFF;
+$focus-ring-outer-color: #000000;
+
+// Image ratios
+$profile-image-ratio: 1 / 1;
+$event-image-ratio: 16 / 9;

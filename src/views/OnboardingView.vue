@@ -517,6 +517,7 @@ async function finishOnboarding() {
 
 <style lang="scss" scoped>
 @use "@/assets/variables" as *;
+@use "@/assets/mixins" as *;
 
 .signup-page {
   min-height: 100vh;
@@ -531,10 +532,10 @@ async function finishOnboarding() {
 }
 
 .signup-content h1 {
+  @include page-title;
+
   margin-bottom: 24px;
   color: $hero-text-color;
-  font-size: 30px;
-  margin-bottom: 24px;
   text-align: center;
 }
 
