@@ -30,8 +30,34 @@ onUnmounted(() => { ++requestId; });
 
 const searchQuery = ref('');
 const selectedCategory = ref('Alle');
+const selectedPriceRange = ref('Alle');
 
 const categories = ['Alle', ...interests.map((interest) => interest.value)];
+
+const priceRanges = [
+  { label: 'Alle priser', value: 'Alle' },
+  { label: 'Gratis', value: 'gratis' },
+  { label: '1–100 kr.', value: '1-100' },
+  { label: '101–250 kr.', value: '101-250' },
+  { label: '251–500 kr.', value: '251-500' },
+  { label: 'Over 500 kr.', value: '500+' },
+];
+
+function getPriceAmount(price) {
+  if (typeof price !== 'string') return null;
+
+  if (price.toLowerCase().includes('gratis')) {
+    return 0;
+  }
+
+  const amount = price.match(/\d[\d.]*(?:,\d+)?/);
+
+  if (!amount) return null;
+
+  return Number(
+    amount[0].replace(/\./g, '').replace(',', '.')
+  );
+}
 
 const filteredEvents = computed(() => {
   return events.value
@@ -44,7 +70,31 @@ const filteredEvents = computed(() => {
         event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         event.location.toLowerCase().includes(searchQuery.value.toLowerCase());
 
-      return matchesCategory && matchesSearch;
+      const price = getPriceAmount(event.price);
+
+      const matchesPrice = (() => {
+        switch (selectedPriceRange.value) {
+          case 'gratis':
+            return price === 0;
+
+          case '1-100':
+            return price !== null && price >= 1 && price <= 100;
+
+          case '101-250':
+            return price !== null && price >= 101 && price <= 250;
+
+          case '251-500':
+            return price !== null && price >= 251 && price <= 500;
+
+          case '500+':
+            return price !== null && price > 500;
+
+          default:
+            return true;
+        }
+      })();
+
+      return matchesCategory && matchesSearch && matchesPrice;
     })
     .sort((a, b) => a.startsAt - b.startsAt);
 });
@@ -83,6 +133,21 @@ const filteredEvents = computed(() => {
         >
           {{ category }}
         </button>
+      </div>
+
+      <!-- Price filter -->
+      <div class="price-filter">
+        <label for="event-price-filter">Pris</label>
+
+        <select id="event-price-filter" v-model="selectedPriceRange">
+          <option
+            v-for="range in priceRanges"
+            :key="range.value"
+            :value="range.value"
+          >
+            {{ range.label }}
+          </option>
+        </select>
       </div>
 
       <!-- Event cards -->
@@ -206,6 +271,41 @@ const filteredEvents = computed(() => {
     background-color: $primary-color;
     color: $background-color;
     border-color: $primary-color;
+  }
+}
+
+//Price filters
+.price-filter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: -1rem 0 2.5rem;
+  color: $hero-text-color;
+
+  label {
+    font-weight: bold;
+  }
+
+  select {
+    min-width: 160px;
+    padding: 0.7rem 2.2rem 0.7rem 1rem;
+    border: 1px solid $hero-text-color;
+    border-radius: 50px;
+    background-color: transparent;
+    color: $hero-text-color;
+    font: inherit;
+    cursor: pointer;
+
+    option {
+      color: $background-color;
+      background-color: $hero-text-color;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $primary-color;
+      outline-offset: 3px;
+    }
   }
 }
 
