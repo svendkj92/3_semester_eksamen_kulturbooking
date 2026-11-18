@@ -1,10 +1,10 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterView } from 'vue-router';
 import { interests } from '@/services/interestService';
 import { getEvents } from '@/services/eventService';
-import { formatEventDate, formatEventTime } from '@/services/eventData';
+import EventList from '@/components/EventList.vue';
 
 const events = ref([]);
 const isLoading = ref(true);
@@ -150,49 +150,10 @@ const filteredEvents = computed(() => {
         </select>
       </div>
 
-      <!-- Event cards -->
-      <div v-if="!isLoading && !loadError" class="events-container">
-
-        <div
-          v-for="event in filteredEvents"
-          :key="event.id"
-          class="event-card"
-        >
-          <div class="event-card__image">
-            <img
-              :src="event.image"
-              :alt="event.title"
-              loading="lazy"
-            />
-
-            <div class="event-card__price">
-              <span>{{ event.price }}</span>
-            </div>
-
-            <span class="event-card__category">
-              {{ event.category }}
-            </span>
-          </div>
-
-          <div class="event-card__content">
-            <h3>{{ event.title }}</h3>
-            <div class="event-card__meta">
-              <span>{{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}</span>
-              <span>{{ event.location }}</span>
-            </div>
-
-            <RouterLink
-              :to="`/events/${event.id}`"
-              class="event-card__link"
-              aria-haspopup="dialog"
-            >
-              Se event
-              <span aria-hidden="true">→</span>
-            </RouterLink>
-          </div>
-        </div>
-
-      </div>
+      <EventList
+        v-if="!isLoading && !loadError"
+        :events="filteredEvents"
+      />
 
       <!-- Empty state -->
       <div

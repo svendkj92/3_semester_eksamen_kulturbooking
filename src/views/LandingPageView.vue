@@ -1,24 +1,53 @@
 
 <script setup>
 import { RouterLink } from 'vue-router';
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { interests } from '@/services/interestService';
+import { getEvents } from '@/services/eventService';
+import EventList from '@/components/EventList.vue';
 
 const words = interests.map((interest) => `${interest.label.toLocaleUpperCase('da-DK')}?`);
 
 const currentIndex = ref(0);
-
 const currentWord = ref(words[currentIndex.value]);
 
 let interval = null;
 
+// Events
+const events = ref([]);
+const isLoading = ref(true);
+const loadError = ref('');
+
+const upcomingEvents = computed(() => {
+  const now = Date.now();
+
+  return [...events.value]
+    .filter((event) => event.startsAt >= now)
+    .sort((a, b) => a.startsAt - b.startsAt)
+    .slice(0, 3);
+});
+
+async function loadEvents() {
+  isLoading.value = true;
+  loadError.value = '';
+
+  try {
+    events.value = await getEvents();
+  } catch (error) {
+    console.error('Kunne ikke hente events:', error);
+    loadError.value = 'Events kunne ikke indlæses. Prøv igen senere.';
+  } finally {
+    isLoading.value = false;
+  }
+}
+
 onMounted(() => {
   interval = setInterval(() => {
-    currentIndex.value =
-      (currentIndex.value + 1) % words.length;
-
+    currentIndex.value = (currentIndex.value + 1) % words.length;
     currentWord.value = words[currentIndex.value];
   }, 3000);
+
+  loadEvents();
 });
 
 onUnmounted(() => {
@@ -59,17 +88,52 @@ onUnmounted(() => {
 
       <section class="steps">
           <div class="step">
-            <div class="step-number">&#10004;</div>
+            <div class="step-icon">&#10004;</div>
             <h2>Opret bruger</h2>
+            <p>Gå på opdagelse i musik, workshops og kreative events i Odense.</p>
           </div>
           <div class="step">
-            <div class="step-number">&#10004;</div>
+            <div class="step-icon">&#10004;</div>
             <h2>Vælg dine interesser</h2>
+            <p>Vælg dine interesser, når du opretter en profil, og få forslag til events, der matcher det, du godt kan lide.</p>
           </div>
           <div class="step">
-            <div class="step-number">&#10004;</div>
+            <div class="step-icon">&#10004;</div>
             <h2>Find events og fællesskaber</h2>
+            <p>Find et event, der vækker din nysgerrighed, og mød andre, der også har lyst til at være med.</p>
           </div>
+      </section>
+
+      <section class="upcoming-events">
+        <div class="upcoming-events__header">
+          <h2>Kommende events</h2>
+          <p>
+            Find inspiration til din næste oplevelse i Odense.
+          </p>
+        </div>
+
+        <p v-if="isLoading" class="events-message">
+          Henter kommende events...
+        </p>
+
+        <p v-else-if="loadError" class="events-message">
+          {{ loadError }}
+        </p>
+
+        <template v-else>
+          <EventList
+            v-if="upcomingEvents.length"
+            :events="upcomingEvents"
+          />
+
+          <p v-else class="events-message">
+            Der er ingen kommende events lige nu. Kig forbi igen senere!
+          </p>
+        </template>
+
+        <RouterLink to="/events" class="cta-button">
+          Se alle events
+        </RouterLink>
       </section>
 
       <section class="social-proof"> 
@@ -118,7 +182,7 @@ onUnmounted(() => {
 
 .hero {
   width: 100%;
-  min-height: 70vh;
+  min-height: 50vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,6 +210,8 @@ onUnmounted(() => {
     p {
     font-size: clamp(1rem, 2vw, 1.5rem);
     color: $background-color;
+    margin: 0 clamp(2rem, 10vw, 50%);
+    line-height: 1.25;
   }
 }
 
@@ -224,9 +290,16 @@ onUnmounted(() => {
     font-size: clamp(0.8rem, 2vw, 1.5rem);
     font-weight: bold;
   }
+
+  p {
+    color: $hero-text-color;
+    font-size: clamp(0.7rem, 1vw, 1.5rem);
+    line-height: 1.25;
+    margin: 1rem;
+  }
 }
 
-.step-number {
+.step-icon {
   width: clamp(40px, 5vw, 60px);
   height: clamp(40px, 5vw, 60px);
   border-radius: 20%;
@@ -238,6 +311,35 @@ onUnmounted(() => {
   font-weight: bold;
   font-size: 1.2rem;
   margin-bottom: 1rem;
+}
+
+.upcoming-events {
+  padding: 4rem 5%;
+  text-align: center;
+
+  &__header {
+    margin-bottom: 2rem;
+
+    h2 {
+      color: $hero-text-color;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      color: $hero-text-color;
+      opacity: 0.8;
+    }
+  }
+
+  .events-message {
+    color: $hero-text-color;
+    margin: 2rem 0;
+  }
+
+  .cta-button {
+    margin-top: 2.5rem;
+  }
 }
 
 .social-proof {
@@ -291,6 +393,11 @@ onUnmounted(() => {
 }
 
 @media (min-width: 576px) {
+
+  .hero{
+    min-height: 60vh;
+  }
+    
   .hero-content {
     h1 {
       font-size: 3rem;
@@ -303,6 +410,10 @@ onUnmounted(() => {
 }
 
 @media (min-width: 768px) {
+
+  .hero{
+    min-height: 70vh;
+  }
 
   .social-proof {
     flex-direction: row;
@@ -321,6 +432,10 @@ onUnmounted(() => {
 }
 
 @media (min-width: 1440px) {
+
+  .hero{
+    min-height: 90vh;
+  }
 
   .social-proof {
     flex-direction: row;
