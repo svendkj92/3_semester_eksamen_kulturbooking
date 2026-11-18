@@ -143,7 +143,7 @@ async function handleLogin() {
     </button>
     <p>
       Har du ikke en konto? 
-      <RouterLink to="{ path: '/onboarding', query: { redirect: route.query.redirect } }">
+      <RouterLink :to="{ path: '/onboarding', query: { redirect: route.query.redirect } }">
         Opret bruger
       </RouterLink>
     </p>
