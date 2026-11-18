@@ -1,27 +1,36 @@
 @use './variables' as *;
 
 // Main page headings
-@mixin page-title {
+@mixin page-title(
+  $size: $font-size-title,
+  $line-height: $line-height-title
+) {
   font-family: $font-heading;
-  font-size: $font-size-title;
+  font-size: $size;
   font-weight: $font-weight-bold;
-  line-height: $line-height-title;
+  line-height: $line-height;
 }
 
 // Section headings and subtitles
-@mixin section-title {
+@mixin section-title(
+  $size: $font-size-subtitle,
+  $line-height: $line-height-subtitle
+) {
   font-family: $font-body;
-  font-size: $font-size-subtitle;
+  font-size: $size;
   font-weight: $font-weight-bold;
-  line-height: $line-height-subtitle;
+  line-height: $line-height;
 }
 
 // Body text
-@mixin body-text {
+@mixin body-text(
+  $size: $font-size-body,
+  $line-height: $line-height-body
+) {
   font-family: $font-body;
-  font-size: $font-size-body;
+  font-size: $size;
   font-weight: $font-weight-regular;
-  line-height: $line-height-body;
+  line-height: $line-height;
 }
 
 // Keyboard focus indicator

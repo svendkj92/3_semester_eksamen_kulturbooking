@@ -13,33 +13,33 @@ $success-color: #166534; //Successful actions and feedback
 $font-heading: 'Antonio', sans-serif;
 $font-body: 'Inter', sans-serif;
 
-$font-size-title: 30px;
-$font-size-subtitle: 24px;
-$font-size-body: 16px;
+$font-size-title: 1.875rem; // 30px
+$font-size-subtitle: 1.5rem; // 24px
+$font-size-body: 1rem; // 16px
 
-$line-height-title: 36px;
-$line-height-subtitle: 31.2px;
-$line-height-body: 24px;
+$line-height-title: 2.25rem; // 36px
+$line-height-subtitle: 1.95rem; // 31.2px
+$line-height-body: 1.5rem; // 24px
 
 $font-weight-regular: 400;
 $font-weight-bold: 700;
 
 // Spacing
-$space-1: 4px;
-$space-2: 8px;
-$space-3: 16px;
-$space-4: 24px;
-$space-5: 32px;
-$space-6: 48px;
-$space-7: 64px;
+$space-1: 0.25rem; // 4px
+$space-2: 0.5rem; // 8px
+$space-3: 1rem; // 16px
+$space-4: 1.5rem; // 24px
+$space-5: 2rem; // 32px
+$space-6: 3rem; // 48px
+$space-7: 4rem; // 64px
 
 // Border radius
-$radius-input: 4px;
-$radius-button: 4px;
-$radius-card: 8px;
+$radius-input: 0.25rem; // 4px
+$radius-button: 0.25rem; // 4px
+$radius-card: 0.5rem; // 8px
 
 // Layout
-$container-max-width: 1200px;
+$container-max-width: 75rem; // 1200px
 
 $breakpoint-tablet: 768px;
 $breakpoint-desktop: 1024px;
@@ -50,17 +50,17 @@ $grid-columns-mobile: 4;
 $grid-columns-tablet: 8;
 $grid-columns-desktop: 12;
 
-$grid-gap: 24px;
+$grid-gap: 1.5rem; // 24px
 
 // Page margins
-$page-margin-mobile: 16px;
-$page-margin-tablet: 32px;
-$page-margin-desktop: 64px;
+$page-margin-mobile: 1rem; // 16px
+$page-margin-tablet: 2rem; // 32px
+$page-margin-desktop: 4rem; // 64px
 
 // Component dimensions
 $border-width-input: 1px;
-$min-touch-target: 44px;
-$icon-size: 24px;
+$min-touch-target: 2.75rem; // 44px
+$icon-size: 1.5rem; // 24px
 
 // Focus ring
 $focus-ring-inner: 2px;
