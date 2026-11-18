@@ -42,6 +42,7 @@ const emailVerified = ref(false)
 const isSigningUp = ref(false)
 const signupError = ref('')
 const verificationEmailSent = ref(false)
+const verificationEmailResent = ref(false)
 const registeredUser = ref(null)
 const isCheckingVerification = ref(false)
 const isCheckingProfile = ref(false)
@@ -175,10 +176,12 @@ async function resendVerificationEmail() {
     await sendVerificationEmail(registeredUser.value)
 
     verificationEmailSent.value = true
+    verificationEmailResent.value = true
     password.value = ''
   } catch (error) {
+    verificationEmailResent.value = false
     console.error('Verification email failed:', error)
-
+    
     signupError.value =
       'Vi kunne ikke sende bekræftelsesmailen. Prøv igen senere.'
   } finally {
@@ -400,6 +403,14 @@ async function finishOnboarding() {
             Send bekræftelsesmail igen
           </button>
 
+          <p
+           v-if="verificationEmailResent && !emailVerified"
+           class="email-success"
+           role="status"
+          >
+           Bekræftelsesmailen er sendt igen til {{ email }}.
+          </p>
+
           <p 
            v-if="registeredUser && !emailVerified && !verificationEmailSent"
            role="status"
@@ -418,6 +429,14 @@ async function finishOnboarding() {
           </button>
 
         </form>
+
+        <p 
+         v-if="isCheckingProfile"
+          class="profile-loading"
+          role="status"
+        >
+          Tjekker om du allerede har en profil...
+        </p>
 
         <div 
           v-if="emailVerified && !hasExistingProfile && !isCheckingProfile && isOnboardingOpen"
@@ -452,9 +471,18 @@ async function finishOnboarding() {
 
           <div class="onboarding-navigation">
 
+            <p
+              v-if="isSavingProfile"
+              class="profile-loading"
+              role="status"
+            >
+              Gemmer profil...
+            </p>
+
             <button
               v-if="currentStep > 1"
               @click="previousStep"
+              :disabled="isSavingProfile"
             >
               Tilbage
             </button>
@@ -462,6 +490,7 @@ async function finishOnboarding() {
             <button
               v-if="currentStep < 3"
               @click="nextStep"
+              :disabled="isSavingProfile"
             >
               Næste
             </button>
