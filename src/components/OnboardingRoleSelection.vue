@@ -35,9 +35,10 @@ const roles = [
            type="radio"
            name="role"
            :value="role.value"
-            />
-
-         <p class="role-description">{{ role.description }}</p>
+          />
+          
+          <span>{{ role.label }}</span> 
+          <p class="role-description">{{ role.description }}</p>
         
         </label>
     </div>
