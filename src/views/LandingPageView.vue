@@ -46,8 +46,9 @@ onUnmounted(() => {
               </h1>
 
           <p>
-            Udforsk et bredt udvalg af kulturelle oplevelser og fællesskaber i Odense.
-            Find inspiration til din næste oplevelse.
+            Find oplevelser og fællesskaber for unge i Odense. 
+            Uanset om du vil dyrke en interesse eller prøve noget nyt, 
+            kan du finde noget, du har lyst til at være med til.
           </p>
 
           <RouterLink to="/onboarding" class="cta-button">
