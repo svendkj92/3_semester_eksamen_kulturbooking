@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import {
   registerUser,
   sendVerificationEmail,
@@ -17,6 +17,7 @@ import OnboardingInterestSelection from '@/components/OnboardingInterestSelectio
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
 const router = useRouter()
+const route = useRoute()
 const name = ref('')
 const email = ref('')
 const password = ref('')
@@ -236,7 +237,12 @@ async function finishOnboarding() {
     hasExistingProfile.value = true
     isOnboardingOpen.value = false
 
-    await router.push('/profile')
+    const redirect = route.query.redirect
+    const isEventPath =
+     typeof redirect === 'string' &&
+     /^\/events\/[^/?#]+$/.test(redirect)
+
+    await router.push(isEventPath ? redirect : '/profile')
   } catch (error) {
     console.error('Profile save failed:', error)
 

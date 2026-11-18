@@ -72,7 +72,10 @@ async function handleLogin() {
     password.value = '';
     const profile = user.emailVerified ? await getUserProfile(user.uid) : null;
     if (!user.emailVerified || !profile?.profile) {
-      await router.push('/onboarding');
+      await router.push({
+        path: '/onboarding',
+        query: { redirect: route.query.redirect },
+      });
     } else {
       const redirect = route.query.redirect;
       const eventMatch = typeof redirect === 'string' && /^\/events\/[^/?#]+$/.test(redirect);
@@ -138,7 +141,12 @@ async function handleLogin() {
     <button class="mode-button" type="button" :disabled="isSubmitting" @click="switchMode">
       {{ isResettingPassword ? 'Tilbage til login' : 'Glemt adgangskode?' }}
     </button>
-    <p>Har du ikke en konto? <RouterLink to="/onboarding">Opret bruger</RouterLink></p>
+    <p>
+      Har du ikke en konto? 
+      <RouterLink to="{ path: '/onboarding', query: { redirect: route.query.redirect } }">
+        Opret bruger
+      </RouterLink>
+    </p>
   </section>
 </template>
 
