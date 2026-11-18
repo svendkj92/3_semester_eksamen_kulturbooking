@@ -41,6 +41,12 @@ npm run build
 
 Der er ingen betalingsfunktion. `price` er kun information.
 
+**Se event** aabner eventdetaljer i en modal popup over eventoversigten eller
+profilen. Popup'en indeholder til-/afmelding og viser en bekraeftelse efter
+vellykket lagring. Den lukkes med kryds eller Escape; tastaturfokus holdes i
+dialogen og returneres ved lukning. Direkte links som `/events/1` aabner samme
+popup over oversigten. Profilens events opdateres efter til-/afmelding.
+
 - `events/<eventId>` indeholder titel, kategori, `startsAt` (Unix-tid i millisekunder),
   sted, pris, beskrivelse og billede.
 - `users/<uid>` bevarer den eksisterende profil og interesser.

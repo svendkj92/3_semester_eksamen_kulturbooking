@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { getEvent } from '@/services/eventService';
@@ -8,6 +8,16 @@ import { formatEventDate, formatEventTime } from '@/services/eventData';
 import { cancelRegistration, getRegistrations, registerForEvent } from '@/services/registrationService';
 
 const route = useRoute();
+const router = useRouter();
+const emit = defineEmits(['registration-changed']);
+const dialog = ref(null);
+let returnFocus;
+let previousOverflow;
+const parentRoute = computed(() => route.name === 'profile-event-detail' ? 'profile' : 'events');
+
+async function closeDialog() {
+  await router.push({ name: parentRoute.value });
+}
 const event = ref(null);
 const user = shallowRef(null);
 const authReady = ref(false);
@@ -72,7 +82,10 @@ async function toggleRegistration() {
     else await registerForEvent(uid, eventId);
     if (id !== requestId) return;
     isRegistered.value = !wasRegistered;
-    registrationMessage.value = wasRegistered ? 'Du er nu afmeldt eventet.' : 'Du er nu tilmeldt eventet.';
+    registrationMessage.value = wasRegistered
+      ? `Du er nu afmeldt ${event.value.title}. Vi håber at se dig en anden gang!`
+      : `Dejligt, du vil med! Du er nu tilmeldt ${event.value.title}. Du kan finde eventet under Mine events på din profil. Vi glæder os til at se dig!`;
+    emit('registration-changed');
   } catch {
     if (id === requestId) {
       registrationError.value = 'Ændringen kunne ikke bekræftes gemt. Eventet kan være startet, eller adgangen er afvist. Prøv igen eller genindlæs siden.';
@@ -85,6 +98,10 @@ async function toggleRegistration() {
 watch([() => route.params.id, user, authReady], loadEvent);
 
 onMounted(() => {
+  returnFocus = document.activeElement;
+  previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+  dialog.value.showModal();
   clock = setInterval(() => { now.value = Date.now(); }, 1000);
   unsubscribe = onAuthStateChanged(auth, (authUser) => {
     user.value = authUser;
@@ -101,14 +118,28 @@ onUnmounted(() => {
   ++requestId;
   unsubscribe?.();
   clearInterval(clock);
+  document.body.style.overflow = previousOverflow;
+  nextTick(() => {
+    if (returnFocus instanceof HTMLElement && returnFocus.isConnected) returnFocus.focus();
+    else document.querySelector('main h1[tabindex="-1"]')?.focus();
+  });
 });
 </script>
 
 <template>
-  <div class="event-detail-page">
-    <RouterLink class="back-link" :to="{ name: 'events' }">
-      <span aria-hidden="true">←</span> Tilbage til events
-    </RouterLink>
+  <dialog
+    ref="dialog"
+    class="event-detail-page"
+    :aria-labelledby="event ? 'event-title' : 'dialog-title'"
+    @cancel.prevent="closeDialog"
+    @keydown.esc.prevent.stop="closeDialog"
+  >
+    <div class="dialog-toolbar">
+      <h2 v-if="!event" id="dialog-title">Eventdetaljer</h2>
+      <button class="close-button" type="button" aria-label="Luk eventdetaljer" autofocus @click="closeDialog">
+        <span aria-hidden="true">×</span>
+      </button>
+    </div>
 
     <p v-if="isLoading" role="status">Indlæser event…</p>
     <div v-else-if="loadError">
@@ -119,7 +150,7 @@ onUnmounted(() => {
       <img class="event-image" :src="event.image" :alt="event.title" />
       <div class="event-content">
         <p class="event-category">{{ event.category }}</p>
-        <h1 id="event-title">{{ event.title }}</h1>
+        <h2 id="event-title" class="event-title">{{ event.title }}</h2>
         <dl class="event-facts">
           <div>
             <dt>Dato og tid</dt>
@@ -143,11 +174,11 @@ onUnmounted(() => {
           <p>{{ event.description }}</p>
         </section>
         <div class="registration-notice">
-          <p v-if="isRegistered">Du er tilmeldt dette event.</p>
-          <p v-if="hasStarted">Eventet er startet. Der kan ikke oprettes nye tilmeldinger.</p>
+          <p v-if="isRegistered" class="registration-success">Du er tilmeldt dette event.</p>
+          <p v-if="hasStarted" class="registration-warning">Eventet er startet. Der kan ikke oprettes nye tilmeldinger.</p>
           <p v-else-if="!user">
             Log ind for at tilmelde dig.
-            <RouterLink :to="{ name: 'login', query: { redirect: route.path } }">Log ind</RouterLink>
+            <RouterLink :to="{ name: 'login', query: { redirect: `/events/${event.id}` } }">Log ind</RouterLink>
           </p>
           <button
             v-if="user && (isRegistered || !hasStarted)"
@@ -159,40 +190,64 @@ onUnmounted(() => {
             {{ isSaving ? 'Gemmer…' : isRegistered ? 'Afmeld event' : 'Tilmeld event' }}
           </button>
           <p v-if="registrationError" role="alert">{{ registrationError }}</p>
-          <p v-if="registrationMessage" role="status">{{ registrationMessage }}</p>
+          <p v-if="registrationMessage" class="registration-feedback" role="status">{{ registrationMessage }}</p>
         </div>
       </div>
     </article>
 
     <section v-else class="not-found" aria-labelledby="not-found-title">
-      <h1 id="not-found-title">Eventet blev ikke fundet</h1>
+      <h2 id="not-found-title">Eventet blev ikke fundet</h2>
       <p>Vi kunne ikke finde et event på denne adresse. Gå tilbage til oversigten og vælg et event.</p>
     </section>
-  </div>
+  </dialog>
 </template>
 
 <style lang="scss" scoped>
 @use "@/assets/variables" as *;
 
 .event-detail-page {
-  max-width: 1200px;
-  min-height: 60vh;
-  margin: 0 auto;
-  padding: 2rem 1rem 3rem;
+  width: min(1000px, calc(100% - 2rem));
+  max-width: none;
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 1rem 1rem 2rem;
+  border: 0;
+  border-radius: 16px;
+  overflow-y: auto;
+  background-color: $background-color;
   color: $hero-text-color;
+
+  &::backdrop {
+    background-color: rgba($hero-text-color, 0.65);
+  }
 }
 
-.back-link {
-  display: inline-block;
-  margin-bottom: 1.5rem;
-  color: $primary-color;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+.dialog-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin-right: auto;
+  }
+}
+
+.close-button {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid $secondary-color;
+  border-radius: 50%;
+  background: transparent;
+  color: $hero-text-color;
+  font-size: 1.75rem;
+  cursor: pointer;
 
   &:hover {
-    color: $primary-color-hover;
+    background-color: rgba($primary-color, 0.08);
   }
-
   &:focus-visible {
     outline: 2px solid $primary-color;
     outline-offset: 4px;
@@ -227,14 +282,14 @@ onUnmounted(() => {
   font-weight: 600;
 }
 
-h1 {
+.event-title {
   margin: 0.75rem 0 1.5rem;
   font-size: clamp(1.75rem, 4vw, 2.75rem);
   font-weight: 700;
   line-height: 1.2;
 }
 
-h2 {
+.event-content section h2 {
   margin-bottom: 0.5rem;
   font-size: 1.25rem;
   font-weight: 600;
@@ -268,6 +323,33 @@ h2 {
   }
 }
 
+.registration-feedback {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-left: 3px solid $success-color;
+  border-radius: 4px;
+  background-color: $background-color;
+  color: $success-color;
+}
+
+.registration-success {
+  color: $success-color;
+}
+
+.registration-warning,
+.event-detail-page [role="alert"],
+.not-found {
+  color: $error-color;
+}
+
+.event-detail-page [role="alert"] {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-left: 3px solid $error-color;
+  border-radius: 4px;
+  background-color: $background-color;
+}
+
 .registration-button {
   margin: 0.75rem 0;
   padding: 0.75rem 1rem;
@@ -291,7 +373,7 @@ h2 {
 
 @media (min-width: 768px) {
   .event-detail-page {
-    padding: 3rem 2rem 4rem;
+    padding: 1rem 2rem 2rem;
   }
 
   .event-detail {

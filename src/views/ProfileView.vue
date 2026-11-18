@@ -4,7 +4,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { getUserProfile, updateUserInterests, updateUserProfile } from '@/services/userService';
 import { interests as interestOptions } from '@/services/interestService';
-import { RouterLink } from 'vue-router';
+import { RouterLink, RouterView } from 'vue-router';
 import { getEvents } from '@/services/eventService';
 import { getRegistrations } from '@/services/registrationService';
 import { formatEventDate, formatEventTime } from '@/services/eventData';
@@ -257,7 +257,7 @@ onUnmounted(() => {
 <template>
   <div class="profile-page">
     <header class="page-heading">
-      <h1>Min profil</h1>
+      <h1 tabindex="-1">Min profil</h1>
       <p>Dit overblik over interesser og kulturoplevelser.</p>
     </header>
 
@@ -420,7 +420,10 @@ onUnmounted(() => {
                   <p>{{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}</p>
                   <p>{{ event.location }}</p>
                   <p v-if="event.startsAt <= now">Eventet er startet</p>
-                  <RouterLink :to="{ name: 'event-detail', params: { id: event.id } }">
+                  <RouterLink
+                    :to="{ name: 'profile-event-detail', params: { id: event.id } }"
+                    aria-haspopup="dialog"
+                  >
                     Se event<span class="visually-hidden">: {{ event.title }}</span>
                   </RouterLink>
                 </div>
@@ -433,6 +436,7 @@ onUnmounted(() => {
           </p>
         </section>
       </div>
+      <RouterView @registration-changed="loadProfileEvents()" />
     </div>
   </div>
 </template>

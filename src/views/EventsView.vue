@@ -1,7 +1,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, RouterView } from 'vue-router';
 import { interests } from '@/services/interestService';
 import { getEvents } from '@/services/eventService';
 import { formatEventDate, formatEventTime } from '@/services/eventData';
@@ -57,7 +57,7 @@ const filteredEvents = computed(() => {
     <section class="events-section">
 
       <div class="events-section__header">
-        <h1>Udforsk events</h1>
+        <h1 tabindex="-1">Udforsk events</h1>
         <p v-if="!isLoading && !loadError" class="events-count">
           {{ filteredEvents.length }} events
         </p>
@@ -119,6 +119,7 @@ const filteredEvents = computed(() => {
             <RouterLink
               :to="`/events/${event.id}`"
               class="event-card__link"
+              aria-haspopup="dialog"
             >
               Se event
               <span aria-hidden="true">→</span>
@@ -141,6 +142,7 @@ const filteredEvents = computed(() => {
 
     </section>
 
+    <RouterView />
   </main>
 </template>
 

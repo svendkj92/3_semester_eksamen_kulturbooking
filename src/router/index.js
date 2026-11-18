@@ -47,16 +47,25 @@ const router = createRouter({
           path: 'events',
           name: 'events',
           component: () => import('@/views/EventsView.vue'),
-        },
-        {
-          path: 'events/:id',
-          name: 'event-detail',
-          component: () => import('@/views/EventDetailView.vue'),
+          children: [
+            {
+              path: ':id',
+              name: 'event-detail',
+              component: () => import('@/views/EventDetailView.vue'),
+            },
+          ],
         },
         {
           path: 'profile',
           name: 'profile',
           component: () => import('@/views/ProfileView.vue'),
+          children: [
+            {
+              path: 'events/:id',
+              name: 'profile-event-detail',
+              component: () => import('@/views/EventDetailView.vue'),
+            },
+          ],
         },
         ...informationPages.map(({ path, title, description }) => ({
           path,
