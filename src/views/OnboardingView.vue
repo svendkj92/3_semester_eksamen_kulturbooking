@@ -135,8 +135,26 @@ async function handleSignup() {
   signupError.value =
     'Din konto er oprettet, men vi kunne ikke sende bekræftelsesmailen. Prøv at sende den igen.'
   } else {
-  signupError.value =
-    'Registreringen kunne ikke gennemføres. Prøv igen.'
+    switch (error.code) {
+      case 'auth/email-already-in-use':
+        signupError.value =
+          'Denne e-mailadresse er allerede i brug. Log ind eller brug en anden e-mail.'
+        break
+      case 'auth/invalid-email':
+        signupError.value = 'E-mailadressen er ugyldig. Kontrollér den og prøv igen.'
+        break
+      case 'auth/weak-password':
+        signupError.value =
+          'Adgangskoden skal være mindst 6 tegn lang.'
+        break
+      case 'auth/network-request-failed':
+        signupError.value =
+          'Netværksfejl. Kontrollér din internetforbindelse og prøv igen.'
+        break
+      default:
+        signupError.value =
+          'Vi kunne ikke oprette din konto. Prøv igen senere.'
+    }
   }
   } finally {
     isSigningUp.value = false
