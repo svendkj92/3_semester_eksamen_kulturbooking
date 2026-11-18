@@ -5,9 +5,18 @@ const selectedRole = defineModel({
 })
 
 const roles = [
-  { value: 'udforsker', label: 'Udforsker', description: '' },
-  { value: 'skaber', label: 'Skaber', description: '' },
-  { value: 'facilitator', label: 'Facilitator', description: '' }
+  { 
+    value: 'udforsker', 
+    label: 'Udforsker', 
+    description: 'Jeg vil opdage nye oplevelser, møde andre og deltage i events.' },
+  { 
+    value: 'skaber', 
+    label: 'Skaber', 
+    description: 'Jeg vil bruge min kreativitet, dele mine idéer og være med til at skabe noget.' },
+  { 
+    value: 'facilitator', 
+    label: 'Facilitator', 
+    description: 'Jeg repræsenterer en virksomhed eller organisation, der ønsker at arrangere events og skabe oplevelser for andre.' }
 ]
 
 </script>
