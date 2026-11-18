@@ -209,11 +209,9 @@ function previousStep() {
     currentStep.value--
   }
 }
+
 function closeOnboarding() {
-  if (!selectedRole.value) {
-    selectedRole.value = 'udforsker'
-  }
-  isOnboardingOpen.value = false
+  void finishOnboarding()
 }
 
 async function finishOnboarding() {
@@ -394,10 +392,11 @@ async function finishOnboarding() {
 
           <button
             type="button"
-            aria-label="Luk onboarding"
+            aria-label="Spring resten over og gem profil"
             @click="closeOnboarding"
+            :disabled="isSavingProfile"
           >
-           x
+           {{ isSavingProfile ? '...' : '×' }}
           </button>
 
           <p class="onboarding-progress">
@@ -419,7 +418,7 @@ async function finishOnboarding() {
           />
 
           <div class="onboarding-navigation">
-            
+
             <button
               v-if="currentStep > 1"
               @click="previousStep"
