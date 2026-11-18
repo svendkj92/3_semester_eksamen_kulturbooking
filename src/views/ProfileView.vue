@@ -430,7 +430,12 @@ onUnmounted(() => {
               </article>
             </li>
           </ul>
-          <p v-else class="empty-state">{{ section.empty }}</p>
+          <div v-else class="empty-state">
+            <p>{{ section.empty }}</p>
+            <RouterLink v-if="section.id === 'my-events'" class="find-events-button" :to="{ name: 'events' }">
+              Find events
+            </RouterLink>
+          </div>
           <p v-if="section.id === 'my-events' && unavailableRegistrations" role="status">
             {{ unavailableRegistrations }} af dine tilmeldte events er ikke længere tilgængelige.
           </p>
@@ -443,6 +448,28 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 @use "@/assets/variables" as *;
+
+.find-events-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  background-color: $primary-color;
+  color: $background-color;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $primary-color-hover;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 4px;
+  }
+}
 
 .profile-page {
   max-width: 1200px;
