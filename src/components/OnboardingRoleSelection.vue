@@ -7,7 +7,7 @@ const selectedRole = defineModel({
 const roles = [
   { value: 'udforsker', label: 'Udforsker', description: '' },
   { value: 'skaber', label: 'Skaber', description: '' },
-  { value: 'partner', label: 'Partner', description: '' }
+  { value: 'facilitator', label: 'Facilitator', description: '' }
 ]
 
 </script>
