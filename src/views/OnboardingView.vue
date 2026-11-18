@@ -527,7 +527,15 @@ async function finishOnboarding() {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 24px 16px 48px;
+}
+
+.signup-content h1 {
+  margin-bottom: 24px;
+  color: $hero-text-color;
+  font-size: 30px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .social-login {
