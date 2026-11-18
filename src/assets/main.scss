@@ -1,8 +1,5 @@
+@use './variables' as *;
 @import './base.css';
-
-* {
-  box-sizing: border-box;
-}
 
 html,
 body,
@@ -14,9 +11,9 @@ body,
   font-weight: normal;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: inherit;
-  transition: 0.4s;
+body {
+  color: $hero-text-color;
+  background-color: $background-color;
 }
+
+
