@@ -8,14 +8,14 @@ body,
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  }
+}
 
 body {
   color: $hero-text-color;
   background-color: $background-color;
   font-family: $font-body;
   font-size: $font-size-body;
-  font-weight: 400;
+  font-weight: $font-weight-regular;
   line-height: $line-height-body;
 }
 
