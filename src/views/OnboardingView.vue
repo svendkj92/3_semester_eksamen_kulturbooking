@@ -517,7 +517,6 @@ async function finishOnboarding() {
 
 <style lang="scss" scoped>
 @use "@/assets/variables" as *;
-@use "@/assets/mixins" as *;
 
 .signup-page {
   min-height: 100vh;
@@ -528,13 +527,15 @@ async function finishOnboarding() {
   width: 100%;
   max-width: 400px;
   margin: 0 auto;
-  padding: 24px 16px 48px;
+  padding: $space-4 $page-margin-mobile $space-6;
 }
 
 .signup-content h1 {
-  @include page-title;
-
-  margin-bottom: 24px;
+  font-family: $font-heading;
+  font-size: $font-size-title;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-title;
+  margin-bottom: $space-4;
   color: $hero-text-color;
   text-align: center;
 }
@@ -542,46 +543,109 @@ async function finishOnboarding() {
 .social-login {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $space-3;
+}
+
+.social-login button {
+  width: 100%;
+  min-height: $min-touch-target;
+  padding: $space-2 $space-3;
+  border-radius: $radius-button;
+  font: inherit;
+  cursor: pointer;
 }
 
 .divider {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: $space-3;
 
   &::before,
   &::after {
     content: "";
     flex: 1;
-    height: 1px;
-    background-color: #64748B;
+    height: $border-width-input;
+    background-color: $secondary-color;
   }
 }
 
 .email-login {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: $space-2;
 
   input {
     width: 100%;
-    min-height: 44px;
-    padding: 8px 16px;
-    border: 1px solid $hero-text-color;
-    border-radius: 4px;
-    box-sizing: border-box;
+    min-height: $min-touch-target;
+    padding: $space-2 $space-3;
+    border: $border-width-input solid $hero-text-color;
+    border-radius: $radius-input;
+    font: inherit;
+    background-color: #ffffff;
+    color: $hero-text-color;
 
     &.input-error {
-      border-color: #DC2626;
+      border-color: $error-color;
     }
   }
 }
-.email-error {
-  color: #DC2626;
-}
-.email-success {
-  color: #166534;
+
+.email-login label {
+  font-family: $font-body;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-label;
+  color: $hero-text-color;
 }
 
+.email-login button[type="submit"] {
+  width: 100%;
+  min-height: $min-touch-target;
+  padding: $space-2 $space-3;
+  margin-top: $space-2;
+
+  border: none;
+  border-radius: $radius-button;
+
+  background-color: $cta-color;
+  color: $hero-text-color;
+
+  font-family: $font-body;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $cta-color-hover;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.name-field,
+.password-field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.email-error {
+  color: $error-color;
+}
+.email-success {
+  color: $success-color;
+}
+
+.signup-content {
+  input:focus-visible,
+  button:focus-visible, 
+  a:focus-visible {
+    outline: none;
+    box-shadow: 
+    0 0 0 $focus-ring-inner $focus-ring-inner-color, 
+    0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
+  }
+}
 </style>
