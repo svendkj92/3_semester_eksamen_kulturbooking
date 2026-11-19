@@ -59,7 +59,7 @@ defineProps({
   overflow: hidden;
   max-width: 500px;
   width: 100%;
-  border-radius: 12px;
+  border-radius: $radius-card;
   background-color: $hero-text-color;
   transition: transform 0.3s ease;
 
@@ -128,6 +128,7 @@ defineProps({
 
   h3 {
     color: $background-color;
+    font-family: $font-heading;
     font-size: 1.4rem;
     margin-bottom: 0.75rem;
   }
