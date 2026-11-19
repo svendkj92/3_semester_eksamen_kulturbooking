@@ -12,7 +12,6 @@ import LandingPageHeader from '@/components/LandingPageHeader.vue';
     <main>
       <RouterView />
     </main>
-
-    <AppFooter />
+    
   </div>
 </template>
