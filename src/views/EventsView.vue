@@ -5,7 +5,11 @@ import { RouterView } from 'vue-router';
 import { interests } from '@/services/interestService';
 import { getEvents } from '@/services/eventService';
 import EventList from '@/components/EventList.vue';
+import { useI18n } from 'vue-i18n';
+import { useEventFormatting } from '@/i18n/useEventFormatting';
 
+const { t } = useI18n();
+const { interestLabel } = useEventFormatting();
 const events = ref([]);
 const isLoading = ref(true);
 const loadError = ref('');
@@ -19,7 +23,7 @@ async function loadEvents() {
     const data = await getEvents();
     if (id === requestId) events.value = data;
   } catch {
-    if (id === requestId) loadError.value = 'Events kunne ikke indlæses. Kontrollér forbindelsen og prøv igen.';
+    if (id === requestId) loadError.value = 'events.loadError';
   } finally {
     if (id === requestId) isLoading.value = false;
   }
@@ -34,14 +38,14 @@ const selectedPriceRange = ref('Alle');
 
 const categories = ['Alle', ...interests.map((interest) => interest.value)];
 
-const priceRanges = [
-  { label: 'Alle priser', value: 'Alle' },
-  { label: 'Gratis', value: 'gratis' },
-  { label: '1–100 kr.', value: '1-100' },
-  { label: '101–250 kr.', value: '101-250' },
-  { label: '251–500 kr.', value: '251-500' },
-  { label: 'Over 500 kr.', value: '500+' },
-];
+const priceRanges = computed(() => [
+  { label: t('events.allPrices'), value: 'Alle' },
+  { label: t('common.free'), value: 'gratis' },
+  { label: t('events.range', { min: 1, max: 100 }), value: '1-100' },
+  { label: t('events.range', { min: 101, max: 250 }), value: '101-250' },
+  { label: t('events.range', { min: 251, max: 500 }), value: '251-500' },
+  { label: t('events.over500'), value: '500+' },
+]);
 
 function getPriceAmount(price) {
   if (typeof price !== 'string') return null;
@@ -107,16 +111,16 @@ const filteredEvents = computed(() => {
     <section class="events-section">
 
       <div class="events-section__header">
-        <h1 tabindex="-1">Udforsk events</h1>
+        <h1 tabindex="-1">{{ t('events.explore') }}</h1>
         <p v-if="!isLoading && !loadError" class="events-count">
-          {{ filteredEvents.length }} events
+          {{ t('events.count', { count: filteredEvents.length }) }}
         </p>
       </div>
 
-      <p v-if="isLoading" role="status">Indlæser events…</p>
+      <p v-if="isLoading" role="status">{{ t('events.loading') }}</p>
       <div v-else-if="loadError">
-        <p role="alert">{{ loadError }}</p>
-        <button type="button" @click="loadEvents">Prøv igen</button>
+        <p role="alert">{{ t(loadError) }}</p>
+        <button type="button" @click="loadEvents">{{ t('common.retry') }}</button>
       </div>
 
       <!-- Category filters -->
@@ -131,13 +135,13 @@ const filteredEvents = computed(() => {
           class="category-filter"
           @click="selectedCategory = category"
         >
-          {{ category }}
+          {{ category === 'Alle' ? t('common.all') : interestLabel(category) }}
         </button>
       </div>
 
       <!-- Price filter -->
       <div class="price-filter">
-        <label for="event-price-filter">Pris</label>
+        <label for="event-price-filter">{{ t('events.price') }}</label>
 
         <select id="event-price-filter" v-model="selectedPriceRange">
           <option
@@ -160,9 +164,9 @@ const filteredEvents = computed(() => {
         v-if="!isLoading && !loadError && filteredEvents.length === 0"
         class="events-empty"
       >
-        <h3>Ingen events fundet</h3>
+        <h3>{{ t('events.none') }}</h3>
         <p>
-          Prøv at ændre din søgning eller vælge en anden kategori.
+          {{ t('events.changeFilters') }}
         </p>
       </div>
 

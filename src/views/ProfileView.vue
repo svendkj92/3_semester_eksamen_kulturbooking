@@ -7,8 +7,11 @@ import { interests as interestOptions } from '@/services/interestService';
 import { RouterLink, RouterView } from 'vue-router';
 import { getEvents } from '@/services/eventService';
 import { getRegistrations } from '@/services/registrationService';
-import { formatEventDate, formatEventTime } from '@/services/eventData';
+import { useI18n } from 'vue-i18n';
+import { useEventFormatting } from '@/i18n/useEventFormatting';
 
+const { t } = useI18n();
+const { eventDate, eventTime, interestLabel } = useEventFormatting();
 const user = shallowRef(null);
 const profile = ref(null);
 const interests = ref([]);
@@ -25,7 +28,7 @@ const draftName = ref('');
 const isSavingName = ref(false);
 const nameError = ref('');
 const nameSaveMessage = ref('');
-const displayName = computed(() => profile.value?.displayName || user.value?.displayName || 'Min profil');
+const displayName = computed(() => profile.value?.displayName || user.value?.displayName || t('common.profile'));
 let unsubscribe;
 let requestId = 0;
 let eventsRequestId = 0;
@@ -39,18 +42,18 @@ const now = ref(Date.now());
 const eventSections = computed(() => [
   {
     id: 'recommended',
-    title: 'Anbefalede events',
+    title: t('profile.recommended'),
     events: events.value.filter((event) => event.startsAt > now.value
       && interests.value.includes(event.category) && !registrations.value[event.id]),
     empty: interests.value.length
-      ? 'Der er ingen kommende events, der matcher dine interesser, og som du ikke allerede er tilmeldt.'
-      : 'Vælg interesser for at få anbefalet events.',
+      ? t('profile.noRecommended')
+      : t('profile.chooseForRecommendations'),
   },
   {
     id: 'my-events',
-    title: 'Mine events',
+    title: t('profile.myEvents'),
     events: events.value.filter((event) => registrations.value[event.id]),
-    empty: 'Du er ikke tilmeldt nogen events endnu.',
+    empty: t('profile.noEvents'),
   },
 ]);
 
@@ -74,7 +77,7 @@ async function loadProfileEvents(authUser = user.value) {
     registrations.value = registrationData;
   } catch {
     if (id === eventsRequestId) {
-      eventsError.value = 'Events og tilmeldinger kunne ikke indlæses. Kontrollér forbindelsen og prøv igen.';
+      eventsError.value = 'profile.eventsError';
     }
   } finally {
     if (id === eventsRequestId) eventsLoading.value = false;
@@ -106,20 +109,20 @@ async function loadProfile(authUser) {
     const data = await getUserProfile(authUser.uid);
     if (id !== requestId) return;
     if (!data?.profile) {
-      loadError.value = 'Din brugerprofil findes ikke endnu. Opret først din profil via tilmeldingen.';
+      loadError.value = 'profile.missing';
       return;
     }
     if (data.interests != null
       && (!Array.isArray(data.interests)
         || !data.interests.every((interest) => typeof interest === 'string' && interest.trim()))) {
-      loadError.value = 'Dine interesser har et ugyldigt format i databasen og kunne ikke indlæses.';
+      loadError.value = 'profile.invalidInterests';
       return;
     }
     profile.value = data.profile;
     interests.value = data.interests ?? [];
   } catch {
     if (id === requestId) {
-      loadError.value = 'Din profil kunne ikke indlæses. Kontrollér din forbindelse og prøv igen.';
+      loadError.value = 'profile.loadError';
     }
   } finally {
     if (id === requestId) isLoading.value = false;
@@ -141,7 +144,7 @@ function cancelEditing() {
 }
 
 function startEditingName() {
-  draftName.value = displayName.value === 'Min profil' ? '' : displayName.value;
+  draftName.value = profile.value?.displayName || user.value?.displayName || '';
   nameError.value = '';
   nameSaveMessage.value = '';
   isEditingName.value = true;
@@ -155,12 +158,12 @@ function cancelEditingName() {
 async function saveName() {
   if (isSavingName.value) return;
   if (!user.value || auth.currentUser?.uid !== user.value.uid) {
-    nameError.value = 'Du skal være logget ind for at ændre dit navn.';
+    nameError.value = 'profile.nameAuth';
     return;
   }
   const trimmedName = draftName.value.trim();
   if (!trimmedName) {
-    nameError.value = 'Skriv et navn, før du gemmer.';
+    nameError.value = 'profile.nameRequired';
     return;
   }
   const id = requestId;
@@ -172,10 +175,10 @@ async function saveName() {
     if (id !== requestId) return;
     profile.value = { ...profile.value, displayName: trimmedName };
     isEditingName.value = false;
-    nameSaveMessage.value = 'Dit navn er gemt.';
+    nameSaveMessage.value = 'profile.nameSaved';
   } catch {
     if (id === requestId) {
-      nameError.value = 'Navnet kunne ikke gemmes. Prøv igen.';
+      nameError.value = 'profile.nameError';
     }
   } finally {
     if (id === requestId) isSavingName.value = false;
@@ -186,15 +189,15 @@ function addInterest() {
   editError.value = '';
   const interest = newInterest.value.trim();
   if (!interest) {
-    editError.value = 'Vælg en interesse, før du tilføjer den.';
+    editError.value = 'profile.interestRequired';
     return;
   }
   if (!interestOptions.some((option) => option.value === interest)) {
-    editError.value = 'Vælg en interesse fra listen.';
+    editError.value = 'profile.invalidInterest';
     return;
   }
   if (draftInterests.value.some((item) => item.toLocaleLowerCase('da') === interest.toLocaleLowerCase('da'))) {
-    editError.value = 'Interessen er allerede på din liste.';
+    editError.value = 'profile.duplicateInterest';
     return;
   }
   draftInterests.value.push(interest);
@@ -204,11 +207,11 @@ function addInterest() {
 async function saveInterests() {
   if (isSaving.value) return;
   if (!user.value || auth.currentUser?.uid !== user.value.uid) {
-    editError.value = 'Du skal være logget ind for at gemme interesser.';
+    editError.value = 'profile.interestAuth';
     return;
   }
   if (newInterest.value.trim()) {
-    editError.value = 'Tilføj den valgte interesse eller ryd feltet, før du gemmer.';
+    editError.value = 'profile.pendingInterest';
     return;
   }
   const id = requestId;
@@ -221,10 +224,10 @@ async function saveInterests() {
     if (id !== requestId) return;
     interests.value = updatedInterests;
     isEditing.value = false;
-    saveMessage.value = 'Dine interesser er gemt.';
+    saveMessage.value = 'profile.interestsSaved';
   } catch {
     if (id === requestId) {
-      editError.value = 'Ændringerne kunne ikke bekræftes gemt. Prøv at gemme igen.';
+      editError.value = 'profile.saveError';
     }
   } finally {
     if (id === requestId) isSaving.value = false;
@@ -242,7 +245,7 @@ onMounted(() => {
     profile.value = null;
     interests.value = [];
     isLoading.value = false;
-    loadError.value = 'Loginstatus kunne ikke indlæses. Genindlæs siden og prøv igen.';
+    loadError.value = 'profile.authError';
   });
 });
 
@@ -257,20 +260,20 @@ onUnmounted(() => {
 <template>
   <div class="profile-page">
     <header class="page-heading">
-      <h1 tabindex="-1">Min profil</h1>
-      <p>Dit overblik over interesser og kulturoplevelser.</p>
+      <h1 tabindex="-1">{{ t('common.profile') }}</h1>
+      <p>{{ t('profile.intro') }}</p>
     </header>
 
-    <p v-if="isLoading" class="profile-notice" role="status">Indlæser din profil…</p>
+    <p v-if="isLoading" class="profile-notice" role="status">{{ t('profile.loading') }}</p>
     <div v-else-if="loadError" class="profile-notice">
-      <p class="error-message" role="alert">{{ loadError }}</p>
+      <p class="error-message" role="alert">{{ t(loadError) }}</p>
       <button v-if="user" class="action-button" type="button" @click="loadProfile(user)">
-        Prøv igen
+        {{ t('common.retry') }}
       </button>
     </div>
     <p v-else-if="!user" class="profile-notice" role="status">
-      Log ind for at se din profil og dine interesser.
-      <RouterLink to="/login">Log ind</RouterLink>
+      {{ t('profile.loginRequired') }}
+      <RouterLink to="/login">{{ t('common.login') }}</RouterLink>
     </p>
 
     <div v-else-if="profile" class="profile-layout">
@@ -285,8 +288,8 @@ onUnmounted(() => {
             <button
               class="icon-button avatar-button"
               type="button"
-              aria-label="Tilføj profilbillede (kommer senere)"
-              title="Tilføj profilbillede – kommer senere"
+              :aria-label="t('profile.photo')"
+              :title="t('profile.photo')"
               disabled
             >
               <span aria-hidden="true">+</span>
@@ -298,8 +301,8 @@ onUnmounted(() => {
               v-if="!isEditingName"
               class="icon-button edit-name-button"
               type="button"
-              aria-label="Rediger navn"
-              title="Rediger dit navn"
+              :aria-label="t('profile.editName')"
+              :title="t('profile.editName')"
               @click="startEditingName"
             >
               <span aria-hidden="true">✎</span>
@@ -307,8 +310,8 @@ onUnmounted(() => {
           </div>
           <form v-if="isEditingName" class="name-editor" @submit.prevent="saveName">
             <fieldset :disabled="isSavingName">
-              <legend class="visually-hidden">Rediger dit navn</legend>
-              <label for="display-name">Dit navn</label>
+              <legend class="visually-hidden">{{ t('profile.editName') }}</legend>
+              <label for="display-name">{{ t('profile.name') }}</label>
               <input
                 id="display-name"
                 v-model="draftName"
@@ -316,29 +319,29 @@ onUnmounted(() => {
                 :aria-invalid="Boolean(nameError)"
                 :aria-describedby="nameError ? 'name-error' : undefined"
               />
-              <p v-if="nameError" id="name-error" class="error-message" role="alert">{{ nameError }}</p>
+              <p v-if="nameError" id="name-error" class="error-message" role="alert">{{ t(nameError) }}</p>
               <div class="editor-actions">
                 <button class="action-button" type="submit">
-                  {{ isSavingName ? 'Gemmer…' : 'Gem navn' }}
+                  {{ t(isSavingName ? 'common.saving' : 'profile.saveName') }}
                 </button>
                 <button class="action-button secondary-button" type="button" @click="cancelEditingName">
-                  Annuller
+                  {{ t('common.cancel') }}
                 </button>
               </div>
             </fieldset>
           </form>
           <p v-if="profile.email" class="profile-email">{{ profile.email }}</p>
-          <p v-if="nameSaveMessage" class="save-message" role="status">{{ nameSaveMessage }}</p>
+          <p v-if="nameSaveMessage" class="save-message" role="status">{{ t(nameSaveMessage) }}</p>
         </section>
 
         <section class="interests-section" aria-labelledby="interests-heading">
           <div class="section-heading">
-            <h2 id="interests-heading">Mine interesser</h2>
+            <h2 id="interests-heading">{{ t('profile.interests') }}</h2>
             <button
               class="icon-button"
               type="button"
-              aria-label="Rediger interesser"
-              title="Tilføj eller fjern interesser"
+              :aria-label="t('profile.editInterests')"
+              :title="t('profile.editInterests')"
               :aria-expanded="isEditing"
               :disabled="isEditing"
               @click="startEditing"
@@ -348,58 +351,58 @@ onUnmounted(() => {
           </div>
           <form v-if="isEditing" class="interest-editor" @submit.prevent="addInterest">
             <fieldset :disabled="isSaving">
-              <legend>Tilføj eller fjern interesser</legend>
+              <legend>{{ t('profile.editInterests') }}</legend>
               <ul class="interest-grid">
                 <li v-for="(interest, index) in draftInterests" :key="interest">
                   <button
                     class="interest-chip remove-interest"
                     type="button"
-                    :aria-label="`Fjern ${interest}`"
+                    :aria-label="t('profile.remove', { interest: interestLabel(interest) })"
                     @click="draftInterests.splice(index, 1)"
                   >
-                    {{ interest }} <span aria-hidden="true">×</span>
+                    {{ interestLabel(interest) }} <span aria-hidden="true">×</span>
                   </button>
                 </li>
               </ul>
-              <label for="new-interest">Ny interesse</label>
+              <label for="new-interest">{{ t('profile.newInterest') }}</label>
               <select
                 id="new-interest"
                 v-model="newInterest"
                 :aria-invalid="Boolean(editError)"
                 :aria-describedby="editError ? 'interest-error' : undefined"
               >
-                <option value="">Vælg en interesse</option>
+                <option value="">{{ t('profile.chooseInterest') }}</option>
                 <option v-for="interest in interestOptions" :key="interest.value" :value="interest.value">
-                  {{ interest.label }}
+                  {{ interestLabel(interest.value) }}
                 </option>
               </select>
-              <button class="action-button secondary-button" type="submit">Tilføj</button>
-              <p v-if="editError" id="interest-error" class="error-message" role="alert">{{ editError }}</p>
+              <button class="action-button secondary-button" type="submit">{{ t('profile.add') }}</button>
+              <p v-if="editError" id="interest-error" class="error-message" role="alert">{{ t(editError) }}</p>
               <div class="editor-actions">
                 <button class="action-button" type="button" @click="saveInterests">
-                  {{ isSaving ? 'Gemmer…' : 'Gem interesser' }}
+                  {{ t(isSaving ? 'common.saving' : 'profile.saveInterests') }}
                 </button>
                 <button class="action-button secondary-button" type="button" @click="cancelEditing">
-                  Annuller
+                  {{ t('common.cancel') }}
                 </button>
               </div>
             </fieldset>
           </form>
           <ul v-else-if="interests.length" class="interest-grid">
             <li v-for="interest in interests" :key="interest" class="interest-chip">
-              {{ interest }}
+              {{ interestLabel(interest) }}
             </li>
           </ul>
-          <p v-else class="empty-state">Du har ikke valgt nogen interesser endnu.</p>
-          <p v-if="saveMessage" class="save-message" role="status">{{ saveMessage }}</p>
+          <p v-else class="empty-state">{{ t('profile.noInterests') }}</p>
+          <p v-if="saveMessage" class="save-message" role="status">{{ t(saveMessage) }}</p>
         </section>
       </div>
 
       <div class="event-sections">
-        <p v-if="eventsLoading" role="status">Indlæser events og tilmeldinger…</p>
+        <p v-if="eventsLoading" role="status">{{ t('profile.loadingEvents') }}</p>
         <div v-else-if="eventsError">
-          <p class="error-message" role="alert">{{ eventsError }}</p>
-          <button type="button" @click="loadProfileEvents()">Prøv igen</button>
+          <p class="error-message" role="alert">{{ t(eventsError) }}</p>
+          <button type="button" @click="loadProfileEvents()">{{ t('common.retry') }}</button>
         </div>
         <section
           v-for="section in (eventsLoading || eventsError ? [] : eventSections)"
@@ -416,15 +419,15 @@ onUnmounted(() => {
                 <img class="profile-event-image" :src="event.image" :alt="event.title" loading="lazy" />
                 <div class="event-content">
                   <h3>{{ event.title }}</h3>
-                  <p>{{ event.category }}</p>
-                  <p>{{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}</p>
+                  <p>{{ interestLabel(event.category) }}</p>
+                  <p>{{ eventDate(event.startsAt) }} {{ t('common.at') }} {{ eventTime(event.startsAt) }}</p>
                   <p>{{ event.location }}</p>
-                  <p v-if="event.startsAt <= now">Eventet er startet</p>
+                  <p v-if="event.startsAt <= now">{{ t('events.started') }}</p>
                   <RouterLink
                     :to="{ name: 'profile-event-detail', params: { id: event.id } }"
                     aria-haspopup="dialog"
                   >
-                    Se event<span class="visually-hidden">: {{ event.title }}</span>
+                    {{ t('common.viewEvent') }}<span class="visually-hidden">: {{ event.title }}</span>
                   </RouterLink>
                 </div>
               </article>
@@ -433,11 +436,11 @@ onUnmounted(() => {
           <div v-else class="empty-state">
             <p>{{ section.empty }}</p>
             <RouterLink v-if="section.id === 'my-events'" class="find-events-button" :to="{ name: 'events' }">
-              Find events
+              {{ t('common.findEvents') }}
             </RouterLink>
           </div>
           <p v-if="section.id === 'my-events' && unavailableRegistrations" role="status">
-            {{ unavailableRegistrations }} af dine tilmeldte events er ikke længere tilgængelige.
+            {{ t('profile.unavailable', { count: unavailableRegistrations }) }}
           </p>
         </section>
       </div>

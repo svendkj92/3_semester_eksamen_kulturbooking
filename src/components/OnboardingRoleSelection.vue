@@ -1,28 +1,22 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const selectedRole = defineModel({
   type: String,
   default: ''
 })
 
 const roles = [
-  { 
-    value: 'udforsker', 
-    label: 'Udforsker', 
-    description: 'Jeg vil opdage nye oplevelser, møde andre og deltage i events.' },
-  { 
-    value: 'skaber', 
-    label: 'Skaber', 
-    description: 'Jeg vil bruge min kreativitet, dele mine idéer og være med til at skabe noget.' },
-  { 
-    value: 'facilitator', 
-    label: 'Facilitator', 
-    description: 'Jeg repræsenterer en virksomhed eller organisation, der ønsker at arrangere events og skabe oplevelser for andre.' }
+  { value: 'udforsker' },
+  { value: 'skaber' },
+  { value: 'facilitator' }
 ]
 
 </script>
 
 <template>
-    <h2>Vælg din rolle</h2>
+    <h2>{{ t('onboarding.roles.title') }}</h2>
 
     <div class="role-option">
         <label
@@ -37,8 +31,8 @@ const roles = [
            :value="role.value"
           />
           
-          <span>{{ role.label }}</span> 
-          <p class="role-description">{{ role.description }}</p>
+          <span>{{ t('onboarding.roles.' + role.value + '.label') }}</span>
+          <p class="role-description">{{ t('onboarding.roles.' + role.value + '.description') }}</p>
         
         </label>
     </div>

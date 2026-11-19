@@ -5,6 +5,8 @@ export function readEvents(data, images) {
   return Object.entries(data).map(([id, event]) => {
     const textFields = ['title', 'category', 'location', 'price', 'description'];
     if (!event || !textFields.every((field) => typeof event[field] === 'string' && event[field].trim())
+      || (event.descriptionEn !== undefined
+        && (typeof event.descriptionEn !== 'string' || !event.descriptionEn.trim()))
       || !Number.isSafeInteger(event.startsAt) || event.startsAt <= 0
       || event.startsAt > 8640000000000000) {
       throw new Error(`Event ${id} har et ugyldigt format i databasen.`);
@@ -27,8 +29,8 @@ export function readRegistrations(data) {
   return data;
 }
 
-export function formatEventDate(startsAt) {
-  return new Date(startsAt).toLocaleDateString('da-DK', {
+export function formatEventDate(startsAt, locale = 'da') {
+  return new Date(startsAt).toLocaleDateString(locale === 'en' ? 'en-GB' : 'da-DK', {
     timeZone: 'Europe/Copenhagen',
     day: 'numeric',
     month: 'long',
@@ -36,8 +38,8 @@ export function formatEventDate(startsAt) {
   });
 }
 
-export function formatEventTime(startsAt) {
-  return new Date(startsAt).toLocaleTimeString('da-DK', {
+export function formatEventTime(startsAt, locale = 'da') {
+  return new Date(startsAt).toLocaleTimeString(locale === 'en' ? 'en-GB' : 'da-DK', {
     timeZone: 'Europe/Copenhagen',
     hour: '2-digit',
     minute: '2-digit',

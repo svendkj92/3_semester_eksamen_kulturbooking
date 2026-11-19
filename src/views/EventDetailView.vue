@@ -4,9 +4,14 @@ import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '@/services/firebase';
 import { getEvent } from '@/services/eventService';
-import { formatEventDate, formatEventTime } from '@/services/eventData';
 import { cancelRegistration, getRegistrations, registerForEvent } from '@/services/registrationService';
+import { useI18n } from 'vue-i18n';
+import { useEventFormatting } from '@/i18n/useEventFormatting';
+import { getEventDescription } from '@/i18n/eventDescriptions';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
+const { t, locale } = useI18n();
+const { eventDate, eventTime, eventPrice, interestLabel } = useEventFormatting();
 const route = useRoute();
 const router = useRouter();
 const emit = defineEmits(['registration-changed']);
@@ -19,6 +24,7 @@ async function closeDialog() {
   await router.push({ name: parentRoute.value });
 }
 const event = ref(null);
+const description = computed(() => event.value ? getEventDescription(event.value, locale.value) : null);
 const user = shallowRef(null);
 const authReady = ref(false);
 const isLoading = ref(true);
@@ -52,7 +58,7 @@ async function loadEvent() {
     isRegistered.value = Boolean(data && registrations[data.id]);
   } catch {
     if (id === requestId) {
-      loadError.value = 'Eventet eller dine tilmeldinger kunne ikke indlæses. Kontrollér forbindelsen og prøv igen.';
+      loadError.value = 'events.detailError';
     }
   } finally {
     if (id === requestId) isLoading.value = false;
@@ -64,13 +70,13 @@ async function toggleRegistration() {
   registrationError.value = '';
   registrationMessage.value = '';
   if (!user.value || auth.currentUser?.uid !== user.value.uid) {
-    registrationError.value = 'Du skal være logget ind for at tilmelde dig.';
+    registrationError.value = 'events.authRequired';
     return;
   }
   const wasRegistered = isRegistered.value;
   if (!wasRegistered && event.value.startsAt <= Date.now()) {
     now.value = Date.now();
-    registrationError.value = 'Tilmelding er lukket, fordi eventet er startet.';
+    registrationError.value = 'events.registrationClosed';
     return;
   }
   const id = requestId;
@@ -83,12 +89,12 @@ async function toggleRegistration() {
     if (id !== requestId) return;
     isRegistered.value = !wasRegistered;
     registrationMessage.value = wasRegistered
-      ? `Du er nu afmeldt ${event.value.title}. Vi håber at se dig en anden gang!`
-      : `Dejligt, du vil med! Du er nu tilmeldt ${event.value.title}. Du kan finde eventet under Mine events på din profil. Vi glæder os til at se dig!`;
+      ? 'events.cancelled'
+      : 'events.joined';
     emit('registration-changed');
   } catch {
     if (id === requestId) {
-      registrationError.value = 'Ændringen kunne ikke bekræftes gemt. Eventet kan være startet, eller adgangen er afvist. Prøv igen eller genindlæs siden.';
+      registrationError.value = 'events.saveError';
     }
   } finally {
     if (id === requestId) isSaving.value = false;
@@ -110,7 +116,7 @@ onMounted(() => {
     ++requestId;
     event.value = null;
     isLoading.value = false;
-    loadError.value = 'Loginstatus kunne ikke indlæses. Genindlæs siden og prøv igen.';
+    loadError.value = 'profile.authError';
   });
 });
 
@@ -135,50 +141,51 @@ onUnmounted(() => {
     @keydown.esc.prevent.stop="closeDialog"
   >
     <div class="dialog-toolbar">
-      <h2 v-if="!event" id="dialog-title">Eventdetaljer</h2>
-      <button class="close-button" type="button" aria-label="Luk eventdetaljer" autofocus @click="closeDialog">
+      <h2 v-if="!event" id="dialog-title">{{ t('events.details') }}</h2>
+      <LanguageSwitcher />
+      <button class="close-button" type="button" :aria-label="t('events.close')" autofocus @click="closeDialog">
         <span aria-hidden="true">×</span>
       </button>
     </div>
 
-    <p v-if="isLoading" role="status">Indlæser event…</p>
+    <p v-if="isLoading" role="status">{{ t('events.loadingDetail') }}</p>
     <div v-else-if="loadError">
-      <p role="alert">{{ loadError }}</p>
-      <button type="button" @click="loadEvent">Prøv igen</button>
+      <p role="alert">{{ t(loadError) }}</p>
+      <button type="button" @click="loadEvent">{{ t('common.retry') }}</button>
     </div>
     <article v-else-if="event" class="event-detail" aria-labelledby="event-title">
       <img class="event-image" :src="event.image" :alt="event.title" />
       <div class="event-content">
-        <p class="event-category">{{ event.category }}</p>
+        <p class="event-category">{{ interestLabel(event.category) }}</p>
         <h2 id="event-title" class="event-title">{{ event.title }}</h2>
         <dl class="event-facts">
           <div>
-            <dt>Dato og tid</dt>
+            <dt>{{ t('events.date') }}</dt>
             <dd>
               <time :datetime="new Date(event.startsAt).toISOString()">
-                {{ formatEventDate(event.startsAt) }} kl. {{ formatEventTime(event.startsAt) }}
+                {{ eventDate(event.startsAt) }} {{ t('common.at') }} {{ eventTime(event.startsAt) }}
               </time>
             </dd>
           </div>
           <div>
-            <dt>Sted</dt>
+            <dt>{{ t('events.location') }}</dt>
             <dd>{{ event.location }}</dd>
           </div>
           <div>
-            <dt>Pris</dt>
-            <dd>{{ event.price }}</dd>
+            <dt>{{ t('events.price') }}</dt>
+            <dd>{{ eventPrice(event.price) }}</dd>
           </div>
         </dl>
         <section aria-labelledby="event-description">
-          <h2 id="event-description">Om eventet</h2>
-          <p>{{ event.description }}</p>
+          <h2 id="event-description">{{ t('events.about') }}</h2>
+          <p :lang="description.lang">{{ description.text }}</p>
         </section>
         <div class="registration-notice">
-          <p v-if="isRegistered" class="registration-success">Du er tilmeldt dette event.</p>
-          <p v-if="hasStarted" class="registration-warning">Eventet er startet. Der kan ikke oprettes nye tilmeldinger.</p>
+          <p v-if="isRegistered" class="registration-success">{{ t('events.registered') }}</p>
+          <p v-if="hasStarted" class="registration-warning">{{ t('events.closed') }}</p>
           <p v-else-if="!user">
-            Log ind for at tilmelde dig.
-            <RouterLink :to="{ name: 'login', query: { redirect: `/events/${event.id}` } }">Log ind</RouterLink>
+            {{ t('events.loginRequired') }}
+            <RouterLink :to="{ name: 'login', query: { redirect: `/events/${event.id}` } }">{{ t('common.login') }}</RouterLink>
           </p>
           <button
             v-if="user && (isRegistered || !hasStarted)"
@@ -187,17 +194,17 @@ onUnmounted(() => {
             :disabled="isSaving"
             @click="toggleRegistration"
           >
-            {{ isSaving ? 'Gemmer…' : isRegistered ? 'Afmeld event' : 'Tilmeld event' }}
+            {{ t(isSaving ? 'common.saving' : isRegistered ? 'events.cancel' : 'events.register') }}
           </button>
-          <p v-if="registrationError" role="alert">{{ registrationError }}</p>
-          <p v-if="registrationMessage" class="registration-feedback" role="status">{{ registrationMessage }}</p>
+          <p v-if="registrationError" role="alert">{{ t(registrationError) }}</p>
+          <p v-if="registrationMessage" class="registration-feedback" role="status">{{ t(registrationMessage, { title: event.title }) }}</p>
         </div>
       </div>
     </article>
 
     <section v-else class="not-found" aria-labelledby="not-found-title">
-      <h2 id="not-found-title">Eventet blev ikke fundet</h2>
-      <p>Vi kunne ikke finde et event på denne adresse. Gå tilbage til oversigten og vælg et event.</p>
+      <h2 id="not-found-title">{{ t('events.notFound') }}</h2>
+      <p>{{ t('events.notFoundText') }}</p>
     </section>
   </dialog>
 </template>
@@ -224,12 +231,14 @@ onUnmounted(() => {
 
 .dialog-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: 1rem;
   margin-bottom: 1rem;
 
   h2 {
+    flex-basis: 100%;
     margin-right: auto;
   }
 }

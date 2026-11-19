@@ -1,18 +1,19 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 defineProps({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
+  page: { type: String, required: true },
 });
 </script>
 
 <template>
   <section class="information-page" aria-labelledby="information-title">
-    <p class="coming-soon">Kommer snart</p>
-    <h1 id="information-title">{{ title }}</h1>
-    <p>{{ description }}</p>
-    <RouterLink to="/">Tilbage til forsiden</RouterLink>
+    <p class="coming-soon">{{ t('common.comingSoon') }}</p>
+    <h1 id="information-title">{{ t(`info.${page}.title`) }}</h1>
+    <p>{{ t(`info.${page}.description`) }}</p>
+    <RouterLink to="/">{{ t('common.backHome') }}</RouterLink>
   </section>
 </template>
 

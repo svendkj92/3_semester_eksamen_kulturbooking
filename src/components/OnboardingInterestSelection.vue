@@ -1,5 +1,8 @@
 <script setup>
 import { interests } from '@/services/interestService';
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const selectedInterests = defineModel({
   type: Array,
@@ -10,7 +13,7 @@ const selectedInterests = defineModel({
 <template>
 
   <section class="interest-selection">
-    <h2>Vælg dine interesser</h2>
+    <h2>{{ t('onboarding.interestsTitle') }}</h2>
   
      <div class="interest-options">
           <label
@@ -23,7 +26,7 @@ const selectedInterests = defineModel({
              type="checkbox"
              :value="interest.value"
            />
-             <span>{{ interest.label }}</span>
+             <span>{{ t('interests.' + interest.value) }}</span>
            </label>
       </div>
   </section>

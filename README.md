@@ -37,6 +37,22 @@ npm run dev
 npm run build
 ```
 
+## Sprog (DA / EN)
+
+DA / EN kan skiftes paa landing page, i hovednavigationen, i eventpopup'en og
+under onboarding. Dansk er standardsproget. Valget gemmes lokalt i browseren
+(`kulturbooking-language`), og sidens `lang` opdateres sammen med sproget.
+UI-tekster findes i `src/i18n/messages.js` og `src/i18n/onboarding.js`.
+Interessevaerdier i Firebase aendres ikke; kun deres viste navne oversaettes.
+Datoer foelger sproget, men beholder tidszonen `Europe/Copenhagen`.
+
+Eventtitler, stednavne og brugerens egne profiltekster bevares. De fire demo-events'
+beskrivelser har engelske oversaettelser i `src/i18n/eventDescriptions.js`, knyttet
+til den praecise danske kildetekst, saa eksisterende Firebase-data virker uden
+genimport. Nye eller redigerede events kan have et valgfrit `descriptionEn`-felt
+direkte i Firebase. Uden engelsk oversaettelse vises den danske beskrivelse med
+`lang="da"`; den genbruger aldrig en anden beskrivelses oversaettelse.
+
 ## Firebase events og tilmeldinger (MVP)
 
 Der er ingen betalingsfunktion. `price` er kun information.
@@ -80,6 +96,7 @@ Der er ingen lokal fallback: tom database og afvist adgang vises eksplicit i UI.
 
 ```sh
 node --test src/services/eventData.test.js
+node --test src/i18n/messages.test.js
 npm run build
 ```
 

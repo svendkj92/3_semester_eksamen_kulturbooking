@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   registerUser,
   sendVerificationEmail,
@@ -16,6 +17,7 @@ import OnboardingRoleSelection from '@/components/OnboardingRoleSelection.vue'
 import OnboardingInterestSelection from '@/components/OnboardingInterestSelection.vue'
 import OnboardingProfileSetup from '@/components/OnboardingProfileSetup.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const name = ref('')
@@ -72,8 +74,7 @@ async function checkProfileStatus(user) {
     console.error('Profile check failed:', error)
 
     isOnboardingOpen.value = false
-    signupError.value =
-      'Vi kunne ikke hente din profil. Prøv igen senere.'
+    signupError.value = 'onboarding.errors.profileCheck'
   } finally {
     isCheckingProfile.value = false
   }
@@ -133,28 +134,23 @@ async function handleSignup() {
     console.error('Signup failed:', error.code || error.message)
 
    if (registeredUser.value) {
-  signupError.value =
-    'Din konto er oprettet, men vi kunne ikke sende bekræftelsesmailen. Prøv at sende den igen.'
+  signupError.value = 'onboarding.errors.verificationSendAfterSignup'
   } else {
     switch (error.code) {
       case 'auth/email-already-in-use':
-        signupError.value =
-          'Denne e-mailadresse er allerede i brug. Log ind eller brug en anden e-mail.'
+        signupError.value = 'onboarding.errors.emailInUse'
         break
       case 'auth/invalid-email':
-        signupError.value = 'E-mailadressen er ugyldig. Kontrollér den og prøv igen.'
+        signupError.value = 'onboarding.errors.invalidEmail'
         break
       case 'auth/weak-password':
-        signupError.value =
-          'Adgangskoden skal være mindst 6 tegn lang.'
+        signupError.value = 'onboarding.errors.weakPassword'
         break
       case 'auth/network-request-failed':
-        signupError.value =
-          'Netværksfejl. Kontrollér din internetforbindelse og prøv igen.'
+        signupError.value = 'onboarding.errors.network'
         break
       default:
-        signupError.value =
-          'Vi kunne ikke oprette din konto. Prøv igen senere.'
+        signupError.value = 'onboarding.errors.signup'
     }
   }
   } finally {
@@ -182,8 +178,7 @@ async function resendVerificationEmail() {
     verificationEmailResent.value = false
     console.error('Verification email failed:', error)
     
-    signupError.value =
-      'Vi kunne ikke sende bekræftelsesmailen. Prøv igen senere.'
+    signupError.value = 'onboarding.errors.verificationSend'
   } finally {
     isSigningUp.value = false
   }
@@ -199,7 +194,7 @@ async function checkEmailVerification() {
     const user = auth.currentUser
 
     if (!user) {
-      signupError.value = 'Du er ikke logget ind. Log ind igen for at fortsætte.'
+      signupError.value = 'onboarding.errors.notLoggedIn'
       return
     }
 
@@ -209,11 +204,11 @@ async function checkEmailVerification() {
       emailVerified.value = true
       await checkProfileStatus(user)
     } else {
-      signupError.value = 'Din e-mail er endnu ikke bekræftet. Tjek din indbakke.'
+      signupError.value = 'onboarding.errors.notVerified'
     }
   } catch (error) {
     console.error('Email verification check failed:', error)
-    signupError.value = 'Vi kunne ikke kontrollere din e-mail. Prøv igen.'
+    signupError.value = 'onboarding.errors.verificationCheck'
   } finally {
     isCheckingVerification.value = false
   }
@@ -243,7 +238,7 @@ async function finishOnboarding() {
   const user = auth.currentUser
 
   if (!user || !user.emailVerified) {
-    profileSaveError.value = 'Du skal bekræfte din e-mail først.'
+    profileSaveError.value = 'onboarding.errors.verifyFirst'
     return
   }
 
@@ -268,8 +263,7 @@ async function finishOnboarding() {
   } catch (error) {
     console.error('Profile save failed:', error)
 
-    profileSaveError.value =
-      'Vi kunne ikke gemme din profil. Prøv igen.'
+    profileSaveError.value = 'onboarding.errors.profileSave'
   } finally {
     isSavingProfile.value = false
   }
@@ -282,36 +276,36 @@ async function finishOnboarding() {
     
      <section class="signup-content">
 
-        <h1>Velkommen til KulturBooking!</h1>
+        <h1>{{ t('onboarding.welcome') }}</h1>
 
         <div class="social-login">
 
           <button type="button">
-            Fortsæt med Apple
+            {{ t('onboarding.continueApple') }}
           </button>
 
           <button type="button">
-            Fortsæt med Google
+            {{ t('onboarding.continueGoogle') }}
           </button>
 
         </div>
 
         <div class="divider">
-          <span>Eller</span>
+          <span>{{ t('onboarding.or') }}</span>
         </div>
 
         <form class="email-login" novalidate @submit.prevent="handleSignup">
 
           <div class="name-field">
 
-            <label for="name">Navn</label>
+            <label for="name">{{ t('onboarding.name') }}</label>
 
             <input
               id="name"
               v-model="name"
               type="text"
               autocomplete="name"
-              placeholder="Indtast dit navn"
+              :placeholder="t('onboarding.namePlaceholder')"
               required
               @blur="nameTouched = true"
               :class="{ 'input-error': nameTouched && !isNameValid }"
@@ -320,19 +314,19 @@ async function finishOnboarding() {
             <p
               v-if="nameTouched && !isNameValid"
               class="email-error">
-              Indtast venligst dit navn.
+              {{ t('onboarding.nameRequired') }}
             </p>
 
           </div>
 
-          <label for="email">E-mail</label>
+          <label for="email">{{ t('onboarding.email') }}</label>
 
           <input
             id="email"
             v-model="email"
             type="email"
             autocomplete="email"
-            placeholder="Indtast din e-mailadresse"
+            :placeholder="t('onboarding.emailPlaceholder')"
             @blur="emailTouched = true"
             :class="{
             'input-error': emailTouched && email && !isEmailValid
@@ -342,19 +336,19 @@ async function finishOnboarding() {
           <p
             v-if="emailTouched && email && !isEmailValid"
             class="email-error">
-            Indtast venligst en gyldig e-mailadresse.
+            {{ t('onboarding.emailInvalid') }}
           </p>
               
           <div class="password-field">
 
-            <label for="password">Adgangskode</label>
+            <label for="password">{{ t('onboarding.password') }}</label>
 
             <input
               id="password"
               v-model="password"
               type="password"
               autocomplete="new-password"
-              placeholder="Opret en adgangskode"
+              :placeholder="t('onboarding.passwordPlaceholder')"
               minlength="6"
               required
               @blur="passwordTouched = true"
@@ -364,25 +358,25 @@ async function finishOnboarding() {
             <p
               v-if="passwordTouched && !isPasswordValid && !verificationEmailSent"
               class="email-error">
-              Adgangskoden skal være mindst 6 tegn lang.
+              {{ t('onboarding.errors.weakPassword') }}
             </p>
 
           </div>
 
           <p class="privacy-policy">
-            Ved at fortsætte accepterer du vores
-            <a href="#">Privatlivspolitik</a>.
+            {{ t('onboarding.privacyBefore') }}
+            <a href="#">{{ t('onboarding.privacyLink') }}</a>{{ t('onboarding.privacyAfter') }}
           </p>
 
           <button
             type="submit"
             :disabled="!isFormValid || isSigningUp || registeredUser || verificationEmailSent"
           >
-           {{ isSigningUp ? 'Opretter konto...' : 'Opret konto' }}
+           {{ t(isSigningUp ? 'onboarding.creatingAccount' : 'onboarding.createAccount') }}
           </button>
 
           <p v-if="signupError" class="email-error" role="alert">
-            {{ signupError }}
+            {{ t(signupError) }}
           </p>
 
           <p
@@ -390,8 +384,7 @@ async function finishOnboarding() {
            class="email-success"
            role="status"
           >
-           En bekræftelsesmail er sendt til {{ email }}.
-           Tjek din indbakke for at bekræfte din e-mailadresse.
+           {{ t('onboarding.verificationSent', { email }) }}
           </p>
 
           <button
@@ -400,7 +393,7 @@ async function finishOnboarding() {
             @click="resendVerificationEmail"
             :disabled="isSigningUp"
           >
-            Send bekræftelsesmail igen
+            {{ t('onboarding.resendVerification') }}
           </button>
 
           <p
@@ -408,15 +401,14 @@ async function finishOnboarding() {
            class="email-success"
            role="status"
           >
-           Bekræftelsesmailen er sendt igen til {{ email }}.
+           {{ t('onboarding.verificationResent', { email }) }}
           </p>
 
           <p 
            v-if="registeredUser && !emailVerified && !verificationEmailSent"
            role="status"
           >
-           Din konto er oprettet, men din e-mail er endnu ikke bekræftet.
-           Du kan sende en bekræftelsesmail eller kontrollere, om du allerede har bekræftet den.
+           {{ t('onboarding.verificationPending') }}
           </p>
 
           <button
@@ -425,7 +417,7 @@ async function finishOnboarding() {
             @click="checkEmailVerification"
             :disabled="isCheckingVerification"
           >
-            {{ isCheckingVerification ? 'Kontrollerer...' : 'Jeg har bekræftet min e-mail' }}
+            {{ t(isCheckingVerification ? 'onboarding.checking' : 'onboarding.confirmVerified') }}
           </button>
 
         </form>
@@ -435,7 +427,7 @@ async function finishOnboarding() {
           class="profile-loading"
           role="status"
         >
-          Tjekker om du allerede har en profil...
+          {{ t('onboarding.checkingProfile') }}
         </p>
 
         <div 
@@ -444,7 +436,7 @@ async function finishOnboarding() {
 
           <button
             type="button"
-            aria-label="Spring resten over og gem profil"
+            :aria-label="t('onboarding.skipAndSave')"
             @click="closeOnboarding"
             :disabled="isSavingProfile"
           >
@@ -452,7 +444,7 @@ async function finishOnboarding() {
           </button>
 
           <p class="onboarding-progress">
-            Trin  {{ currentStep }} af 3
+            {{ t('onboarding.progress', { currentStep }) }}
           </p>
 
           <OnboardingRoleSelection 
@@ -476,7 +468,7 @@ async function finishOnboarding() {
               class="profile-loading"
               role="status"
             >
-              Gemmer profil...
+              {{ t('onboarding.savingProfile') }}
             </p>
 
             <button
@@ -484,7 +476,7 @@ async function finishOnboarding() {
               @click="previousStep"
               :disabled="isSavingProfile"
             >
-              Tilbage
+              {{ t('onboarding.back') }}
             </button>
 
             <button
@@ -492,7 +484,7 @@ async function finishOnboarding() {
               @click="nextStep"
               :disabled="isSavingProfile"
             >
-              Næste
+              {{ t('onboarding.next') }}
             </button>
 
             <button
@@ -501,13 +493,13 @@ async function finishOnboarding() {
               type="button"
               :disabled="isSavingProfile"
             >
-              {{ isSavingProfile ? 'Gemmer profil...' : 'Afslut' }}
+              {{ t(isSavingProfile ? 'onboarding.savingProfile' : 'onboarding.finish') }}
             </button>
 
             <p v-if="profileSaveError" 
             class="email-error" 
             role="alert">
-              {{ profileSaveError }}
+              {{ t(profileSaveError) }}
             </p>
           </div>
         </div>

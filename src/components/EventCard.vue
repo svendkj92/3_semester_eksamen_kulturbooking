@@ -1,7 +1,11 @@
 
 <script setup>
 import { RouterLink } from 'vue-router';
-import { formatEventDate, formatEventTime } from '@/services/eventData';
+import { useI18n } from 'vue-i18n';
+import { useEventFormatting } from '@/i18n/useEventFormatting';
+
+const { t } = useI18n();
+const { eventDate, eventTime, eventPrice, interestLabel } = useEventFormatting();
 
 defineProps({
   event: {
@@ -21,11 +25,11 @@ defineProps({
       />
 
       <div class="event-card__price">
-        <span>{{ event.price }}</span>
+        <span>{{ eventPrice(event.price) }}</span>
       </div>
 
       <span class="event-card__category">
-        {{ event.category }}
+        {{ interestLabel(event.category) }}
       </span>
     </div>
 
@@ -34,8 +38,8 @@ defineProps({
 
       <div class="event-card__meta">
         <span>
-          {{ formatEventDate(event.startsAt) }}
-          kl. {{ formatEventTime(event.startsAt) }}
+          {{ eventDate(event.startsAt) }}
+          {{ t('common.at') }} {{ eventTime(event.startsAt) }}
         </span>
         <span>{{ event.location }}</span>
       </div>
@@ -45,7 +49,7 @@ defineProps({
         class="event-card__link"
         aria-haspopup="dialog"
       >
-        Se event
+        {{ t('common.viewEvent') }}
         <span aria-hidden="true">→</span>
       </RouterLink>
     </div>

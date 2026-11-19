@@ -5,11 +5,14 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { interests } from '@/services/interestService';
 import { getEvents } from '@/services/eventService';
 import EventList from '@/components/EventList.vue';
+import { useI18n } from 'vue-i18n';
 
-const words = interests.map((interest) => `${interest.label.toLocaleUpperCase('da-DK')}?`);
+const { t, locale } = useI18n();
+const words = computed(() => interests.map((interest) =>
+  `${t(`interests.${interest.value}`).toLocaleUpperCase(locale.value)}?`));
 
 const currentIndex = ref(0);
-const currentWord = ref(words[currentIndex.value]);
+const currentWord = computed(() => words.value[currentIndex.value]);
 
 let interval = null;
 
@@ -35,7 +38,7 @@ async function loadEvents() {
     events.value = await getEvents();
   } catch (error) {
     console.error('Kunne ikke hente events:', error);
-    loadError.value = 'Events kunne ikke indlæses. Prøv igen senere.';
+    loadError.value = 'landing.error';
   } finally {
     isLoading.value = false;
   }
@@ -43,8 +46,7 @@ async function loadEvents() {
 
 onMounted(() => {
   interval = setInterval(() => {
-    currentIndex.value = (currentIndex.value + 1) % words.length;
-    currentWord.value = words[currentIndex.value];
+    currentIndex.value = (currentIndex.value + 1) % words.value.length;
   }, 3000);
 
   loadEvents();
@@ -62,7 +64,7 @@ onUnmounted(() => {
         <div class="hero-content">
               <h1 class="hero-title">
                 <span class="hero-title__intro">
-                  Er du til
+                  {{ t('landing.intro') }}
                 </span>
 
                 <span class="word-window">
@@ -75,13 +77,11 @@ onUnmounted(() => {
               </h1>
 
           <p>
-            Find oplevelser og fællesskaber for unge i Odense. 
-            Uanset om du vil dyrke en interesse eller prøve noget nyt, 
-            kan du finde noget, du har lyst til at være med til.
+            {{ t('landing.hero') }}
           </p>
 
           <RouterLink to="/onboarding" class="cta-button">
-            Kom i gang
+            {{ t('landing.start') }}
           </RouterLink>
         </div>
       </section>
@@ -89,35 +89,35 @@ onUnmounted(() => {
       <section class="steps">
           <div class="step">
             <div class="step-icon">&#10004;</div>
-            <h2>Opret bruger</h2>
-            <p>Gå på opdagelse i musik, workshops og kreative events i Odense.</p>
+            <h2>{{ t('common.signup') }}</h2>
+            <p>{{ t('landing.step1') }}</p>
           </div>
           <div class="step">
             <div class="step-icon">&#10004;</div>
-            <h2>Vælg dine interesser</h2>
-            <p>Vælg dine interesser, når du opretter en profil, og få forslag til events, der matcher det, du godt kan lide.</p>
+            <h2>{{ t('landing.interests') }}</h2>
+            <p>{{ t('landing.step2') }}</p>
           </div>
           <div class="step">
             <div class="step-icon">&#10004;</div>
-            <h2>Find events og fællesskaber</h2>
-            <p>Find et event, der vækker din nysgerrighed, og mød andre, der også har lyst til at være med.</p>
+            <h2>{{ t('landing.communities') }}</h2>
+            <p>{{ t('landing.step3') }}</p>
           </div>
       </section>
 
       <section class="upcoming-events">
         <div class="upcoming-events__header">
-          <h2>Kommende events</h2>
+          <h2>{{ t('landing.upcoming') }}</h2>
           <p>
-            Find inspiration til din næste oplevelse i Odense.
+            {{ t('landing.inspiration') }}
           </p>
         </div>
 
         <p v-if="isLoading" class="events-message">
-          Henter kommende events...
+          {{ t('landing.loading') }}
         </p>
 
         <p v-else-if="loadError" class="events-message">
-          {{ loadError }}
+          {{ t(loadError) }}
         </p>
 
         <template v-else>
@@ -127,42 +127,42 @@ onUnmounted(() => {
           />
 
           <p v-else class="events-message">
-            Der er ingen kommende events lige nu. Kig forbi igen senere!
+            {{ t('landing.empty') }}
           </p>
         </template>
 
         <RouterLink to="/events" class="cta-button">
-          Se alle events
+          {{ t('landing.allEvents') }}
         </RouterLink>
       </section>
 
       <section class="social-proof"> 
         <div class="testimonials">
           <div class="testimonial-card">
-            <p><span lang="en">"Somebody always kind of has your back."</span> - Event deltager</p>
+            <p><span lang="en">"Somebody always kind of has your back."</span> - {{ t('landing.participant') }}</p>
           </div>
           <div class="testimonial-card">
-            <p><span lang="en">"KulturBooking is a place for people to find their place and their voice."</span> - Event deltager</p>
+            <p><span lang="en">"KulturBooking is a place for people to find their place and their voice."</span> - {{ t('landing.participant') }}</p>
           </div>
           <div class="testimonial-card">
-            <p>"Det handler om både at lave events, som alle kan være med til, men også at støtte unge kunstnere og artister her i Odense." - Event deltager</p>
+            <p>{{ t('landing.quote') }} - {{ t('landing.participant') }}</p>
           </div>
         </div>
         <div class="highlight-video">
-          <img src="@/assets/img/video_placeholder.jpg" alt="Highlight video" />
+          <img src="@/assets/img/video_placeholder.jpg" :alt="t('landing.video')" />
 
         </div>
       </section>
 
       <!-- About section -->
       <section id="about" class="about">
-        <h2>Om KulturBooking</h2>
+        <h2>{{ t('info.om.title') }}</h2>
 
         <p>
-          KulturBooking er en kreativ og kulturel platform bygget for unge mennesker i Odense, Danmark. Siden 2025 har vi forbundet musikere, dansere, billedkunstnere og kulturelle fællesskaber med de muligheder, rum og netværk de behøver for at få ting til at ske.
+          {{ t('landing.about1') }}
         </p>
         <p>
-          Vi producerer events, bygger kreative fællesskaber, støtter kunstnere og giver organisationer infrastrukturen til at nå og engagere unge mennesker på måder der holder.
+          {{ t('landing.about2') }}
         </p>
       </section>
     </main>
@@ -239,6 +239,10 @@ onUnmounted(() => {
   color: $background-color;
   white-space: nowrap;
   font-size: clamp(2.5rem, 12vw, 8rem);
+
+  &:lang(en) {
+    font-size: clamp(1.75rem, 8vw, 8rem);
+  }
 }
 
 .roll-enter-active,

@@ -2,7 +2,10 @@
 import { RouterLink, useRoute } from 'vue-router';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { logoutUser, observeAuthState } from '@/services/authService';
+import { useI18n } from 'vue-i18n';
+import LanguageSwitcher from './LanguageSwitcher.vue';
 
+const { t } = useI18n();
 const route = useRoute();
 const menuIsOpen = ref(false);
 const menuButton = ref(null);
@@ -13,8 +16,8 @@ const logoutMessage = ref('');
 let unsubscribeAuth;
 
 const navItems = [
-  { title: 'Events', to: '/events' },
-  { title: 'Om os', to: '/om' },
+  { title: 'nav.events', to: '/events' },
+  { title: 'nav.about', to: '/om' },
 ];
 
 function closeMenu() {
@@ -35,9 +38,9 @@ async function handleLogout() {
   try {
     await logoutUser();
     closeMenu();
-    logoutMessage.value = 'Du er nu logget ud.';
+    logoutMessage.value = 'nav.loggedOut';
   } catch {
-    authError.value = 'Du kunne ikke logges ud. Prøv igen.';
+    authError.value = 'nav.logoutError';
   } finally {
     isLoggingOut.value = false;
   }
@@ -62,7 +65,7 @@ onUnmounted(() => {
 <template>
   <header class="header" @keydown.esc="dismissMenu">
     <div class="header-bar">
-      <RouterLink class="logo" to="/" aria-label="KulturBooking – forsiden" @click="closeMenu">
+      <RouterLink class="logo" to="/" :aria-label="t('common.home')" @click="closeMenu">
         <img src="@/assets/kb_logo.png" alt="" width="60" height="60" />
       </RouterLink>
 
@@ -72,7 +75,7 @@ onUnmounted(() => {
         type="button"
         :aria-expanded="menuIsOpen"
         aria-controls="main-navigation"
-        :aria-label="menuIsOpen ? 'Luk menu' : 'Åbn menu'"
+        :aria-label="t(menuIsOpen ? 'nav.close' : 'nav.open')"
         @click="menuIsOpen = !menuIsOpen"
       >
         <span></span>
@@ -84,16 +87,16 @@ onUnmounted(() => {
         id="main-navigation"
         class="navigation"
         :class="{ 'navigation--open': menuIsOpen }"
-        aria-label="Hovednavigation"
+        :aria-label="t('nav.main')"
       >
         <ul>
           <li v-for="item in navItems" :key="item.to">
             <RouterLink :to="item.to" @click="closeMenu">
-              {{ item.title }}
+              {{ t(item.title) }}
             </RouterLink>
           </li>
           <li v-if="isLoggedIn">
-            <RouterLink to="/profile" @click="closeMenu">Min profil</RouterLink>
+            <RouterLink to="/profile" @click="closeMenu">{{ t('common.profile') }}</RouterLink>
           </li>
           <li v-if="isLoggedIn">
             <button
@@ -102,17 +105,18 @@ onUnmounted(() => {
               :disabled="isLoggingOut"
               @click="handleLogout"
             >
-              {{ isLoggingOut ? 'Logger ud…' : 'Log ud' }}
+              {{ t(isLoggingOut ? 'nav.loggingOut' : 'nav.logout') }}
             </button>
           </li>
           <li v-else>
-            <RouterLink to="/login" @click="closeMenu">Log ind</RouterLink>
+            <RouterLink to="/login" @click="closeMenu">{{ t('common.login') }}</RouterLink>
           </li>
         </ul>
       </nav>
+      <LanguageSwitcher />
     </div>
-    <p v-if="authError" class="auth-error" role="alert">{{ authError }}</p>
-    <p v-if="logoutMessage" class="auth-message" role="status">{{ logoutMessage }}</p>
+    <p v-if="authError" class="auth-error" role="alert">{{ t(authError) }}</p>
+    <p v-if="logoutMessage" class="auth-message" role="status">{{ t(logoutMessage) }}</p>
   </header>
 </template>
 
@@ -148,6 +152,7 @@ onUnmounted(() => {
 
 .burger-button {
   display: flex;
+  margin-left: auto;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -251,12 +256,17 @@ onUnmounted(() => {
     padding: 0;
     background: transparent;
     box-shadow: none;
+    margin-left: auto;
 
     ul {
       flex-direction: row;
       align-items: center;
-      gap: 2rem;
+      gap: clamp(0.75rem, 2vw, 2rem);
     }
+  }
+
+  .language-switcher {
+    margin-left: clamp(1rem, 3vw, 3rem);
   }
 }
 </style>

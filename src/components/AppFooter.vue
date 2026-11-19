@@ -1,32 +1,34 @@
 <script setup>
 import { RouterLink } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const year = new Date().getFullYear();
 const sections = [
   {
-    title: 'Udforsk',
+    title: 'footer.explore',
     links: [
-      { title: 'Events', to: '/events' },
-      { title: 'Skabere', to: '/skabere' },
-      { title: 'Hangouts', to: '/hangouts' },
-      { title: 'Fællesskaber', to: '/faellesskaber' },
+      { title: 'nav.events', to: '/events' },
+      { title: 'info.skabere.title', to: '/skabere' },
+      { title: 'info.hangouts.title', to: '/hangouts' },
+      { title: 'info.faellesskaber.title', to: '/faellesskaber' },
     ],
   },
   {
-    title: 'Om',
+    title: 'footer.about',
     links: [
-      { title: 'Om KulturBooking', to: '/om' },
-      { title: 'Effekt', to: '/effekt' },
-      { title: 'Kontakt', to: '/kontakt' },
-      { title: 'Blog', to: '/blog' },
+      { title: 'info.om.title', to: '/om' },
+      { title: 'info.effekt.title', to: '/effekt' },
+      { title: 'info.kontakt.title', to: '/kontakt' },
+      { title: 'info.blog.title', to: '/blog' },
     ],
   },
   {
-    title: 'Jura & sikkerhed',
+    title: 'footer.legal',
     links: [
-      { title: 'Privatliv', to: '/privatliv' },
-      { title: 'Servicevilkår', to: '/servicevilkaar' },
-      { title: 'Data & sikkerhed', to: '/data-sikkerhed' },
+      { title: 'info.privatliv.title', to: '/privatliv' },
+      { title: 'info.servicevilkaar.title', to: '/servicevilkaar' },
+      { title: 'info.data-sikkerhed.title', to: '/data-sikkerhed' },
     ],
   },
 ];
@@ -35,30 +37,30 @@ const sections = [
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <RouterLink class="footer-brand" to="/" aria-label="KulturBooking – forsiden">
+      <RouterLink class="footer-brand" to="/" :aria-label="t('common.home')">
         <img src="@/assets/kb_logo.png" alt="" width="48" height="48" />
         <span>KulturBooking</span>
       </RouterLink>
 
-      <nav class="footer-navigation" aria-label="Footernavigation">
+      <nav class="footer-navigation" :aria-label="t('footer.navigation')">
         <div v-for="section in sections" :key="section.title" class="footer-section">
-          <h2>{{ section.title }}</h2>
+          <h2>{{ t(section.title) }}</h2>
           <ul>
             <li v-for="link in section.links" :key="link.to">
-              <RouterLink :to="link.to">{{ link.title }}</RouterLink>
+              <RouterLink :to="link.to">{{ t(link.title) }}</RouterLink>
             </li>
           </ul>
         </div>
       </nav>
 
       <div class="footer-bottom">
-        <p>© {{ year }} KulturBooking. For unge, af unge.</p>
+        <p>{{ t('footer.copyright', { year }) }}</p>
         <button
           class="feedback-button"
           type="button"
           disabled
-          title="Feedback kommer snart"
-          aria-label="Feedback – kommer snart"
+          :title="t('footer.feedbackSoon')"
+          :aria-label="t('footer.feedbackSoon')"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 3C6.5 3 2 6.6 2 11c0 2.4 1.3 4.5 3.4 6L4 22l6-3.2c.7.1 1.3.2 2 .2 5.5 0 10-3.6 10-8S17.5 3 12 3Z" />

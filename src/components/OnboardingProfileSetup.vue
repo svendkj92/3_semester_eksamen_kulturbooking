@@ -1,4 +1,8 @@
 <script setup>
+import { ref, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const bio = defineModel('bio', {
   type: String,
   default: ''
@@ -6,8 +10,6 @@ const bio = defineModel('bio', {
 const image = defineModel('image', {
   default: null
 })
-import { ref, onUnmounted } from 'vue'
-
 const imagePreview = ref(
     image.value ? URL.createObjectURL(image.value) : null
 )
@@ -46,9 +48,9 @@ onUnmounted(() => {
 
 <template>
     <section class="profile-setup">
-        <h2>Gør din profil personlig</h2>
+        <h2>{{ t('onboarding.profile.title') }}</h2>
         <div class="profile-image">
-            <label for="profile-image">Tilføj et profilbillede</label>
+            <label for="profile-image">{{ t('onboarding.profile.addImage') }}</label>
 
             <input
              id="profile-image"
@@ -60,7 +62,7 @@ onUnmounted(() => {
             <img
              v-if="imagePreview"
              :src="imagePreview"
-             alt="Forhåndsvisning af profilbillede"
+             :alt="t('onboarding.profile.imagePreview')"
              class="profile-preview"
             />
             <button
@@ -68,17 +70,17 @@ onUnmounted(() => {
              type="button"
              @click="removeImage"
             >
-             Fjern billede
+             {{ t('onboarding.profile.removeImage') }}
             </button>
         </div>
 
         <div class="profile-bio">
-            <label for="profile-bio">Fortæl lidt om dig selv</label>
+            <label for="profile-bio">{{ t('onboarding.profile.bioLabel') }}</label>
 
             <textarea
                 id="profile-bio"
                 v-model="bio"
-                placeholder="Skriv lidt om dig selv (valgfrit)"
+                :placeholder="t('onboarding.profile.bioPlaceholder')"
                 rows="4"
             ></textarea>
         </div>

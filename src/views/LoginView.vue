@@ -3,7 +3,9 @@ import { nextTick, ref } from 'vue';
 import { RouterLink, useRoute, useRouter } from 'vue-router';
 import { loginUser, resetPassword } from '@/services/authService';
 import { getUserProfile } from '@/services/userService';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const email = ref('');
@@ -29,11 +31,11 @@ async function handlePasswordReset() {
   errorMessage.value = '';
   resetMessage.value = '';
   if (!email.value.trim()) {
-    errorMessage.value = 'Indtast din e-mailadresse.';
+    errorMessage.value = 'login.emailRequired';
     return;
   }
   isSubmitting.value = true;
-  const confirmation = 'Hvis der findes en konto med denne e-mailadresse, modtager du en mail med et link til at nulstille adgangskoden. Tjek også uønsket mail.';
+  const confirmation = 'login.resetSent';
   try {
     await resetPassword(email.value.trim());
     resetMessage.value = confirmation;
@@ -43,16 +45,16 @@ async function handlePasswordReset() {
         resetMessage.value = confirmation;
         break;
       case 'auth/invalid-email':
-        errorMessage.value = 'Indtast en gyldig e-mailadresse.';
+        errorMessage.value = 'login.invalidEmail';
         break;
       case 'auth/too-many-requests':
-        errorMessage.value = 'For mange forsøg. Vent lidt og prøv igen.';
+        errorMessage.value = 'login.tooMany';
         break;
       case 'auth/network-request-failed':
-        errorMessage.value = 'Ingen forbindelse. Kontrollér dit netværk og prøv igen.';
+        errorMessage.value = 'login.network';
         break;
       default:
-        errorMessage.value = 'Nulstillingsmailen kunne ikke sendes. Prøv igen senere.';
+        errorMessage.value = 'login.resetFailed';
     }
   } finally {
     isSubmitting.value = false;
@@ -63,7 +65,7 @@ async function handleLogin() {
   if (isSubmitting.value) return;
   errorMessage.value = '';
   if (!email.value.trim() || !password.value) {
-    errorMessage.value = 'Indtast din e-mail og adgangskode.';
+    errorMessage.value = 'login.credentialsRequired';
     return;
   }
   isSubmitting.value = true;
@@ -87,19 +89,19 @@ async function handleLogin() {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-email':
-        errorMessage.value = 'E-mail eller adgangskode er forkert.';
+        errorMessage.value = 'login.invalidCredentials';
         break;
       case 'auth/too-many-requests':
-        errorMessage.value = 'For mange loginforsøg. Vent lidt og prøv igen.';
+        errorMessage.value = 'login.tooManyLogins';
         break;
       case 'auth/network-request-failed':
-        errorMessage.value = 'Ingen forbindelse. Kontrollér dit netværk og prøv igen.';
+        errorMessage.value = 'login.network';
         break;
       case 'auth/user-disabled':
-        errorMessage.value = 'Din konto er deaktiveret. Kontakt KulturBooking.';
+        errorMessage.value = 'login.disabled';
         break;
       default:
-        errorMessage.value = 'Login eller indlæsning af din profil kunne ikke gennemføres. Prøv igen.';
+        errorMessage.value = 'login.failed';
     }
   } finally {
     isSubmitting.value = false;
@@ -109,17 +111,17 @@ async function handleLogin() {
 
 <template>
   <section class="login-page" aria-labelledby="login-title">
-    <h1 id="login-title">{{ isResettingPassword ? 'Glemt adgangskode?' : 'Log ind' }}</h1>
-    <p v-if="isResettingPassword">Indtast din e-mail, så sender vi dig et link til at vælge en ny adgangskode.</p>
-    <p v-else>Velkommen tilbage til KulturBooking.</p>
+    <h1 id="login-title">{{ t(isResettingPassword ? 'login.forgot' : 'common.login') }}</h1>
+    <p v-if="isResettingPassword">{{ t('login.resetIntro') }}</p>
+    <p v-else>{{ t('login.welcome') }}</p>
     <form @submit.prevent="isResettingPassword ? handlePasswordReset() : handleLogin()">
       <fieldset :disabled="isSubmitting">
         <legend class="login-legend">
-          {{ isResettingPassword ? 'Nulstil din adgangskode' : 'Log ind med e-mail og adgangskode' }}
+          {{ t(isResettingPassword ? 'login.resetLegend' : 'login.legend') }}
         </legend>
-        <label for="login-email">E-mail</label>
+        <label for="login-email">{{ t('common.email') }}</label>
         <input ref="emailInput" id="login-email" v-model="email" type="email" autocomplete="username" required />
-        <label v-if="!isResettingPassword" for="login-password">Adgangskode</label>
+        <label v-if="!isResettingPassword" for="login-password">{{ t('common.password') }}</label>
         <input
           v-if="!isResettingPassword"
           id="login-password"
@@ -128,23 +130,23 @@ async function handleLogin() {
           autocomplete="current-password"
           required
         />
-        <p v-if="errorMessage" class="login-error" role="alert">{{ errorMessage }}</p>
+        <p v-if="errorMessage" class="login-error" role="alert">{{ t(errorMessage) }}</p>
         <button type="submit">
-          {{ isResettingPassword ? (isSubmitting ? 'Sender…' : 'Send nulstillingslink') : (isSubmitting ? 'Logger ind…' : 'Log ind') }}
+          {{ t(isResettingPassword ? (isSubmitting ? 'login.sending' : 'login.sendLink') : (isSubmitting ? 'login.loggingIn' : 'common.login')) }}
         </button>
       </fieldset>
       <p v-if="isSubmitting" role="status">
-        {{ isResettingPassword ? 'Sender nulstillingsmail…' : 'Logger ind og henter din profil…' }}
+        {{ t(isResettingPassword ? 'login.sendingMail' : 'login.loadingProfile') }}
       </p>
-      <p v-if="resetMessage" role="status">{{ resetMessage }}</p>
+      <p v-if="resetMessage" role="status">{{ t(resetMessage) }}</p>
     </form>
     <button class="mode-button" type="button" :disabled="isSubmitting" @click="switchMode">
-      {{ isResettingPassword ? 'Tilbage til login' : 'Glemt adgangskode?' }}
+      {{ t(isResettingPassword ? 'login.back' : 'login.forgot') }}
     </button>
     <p>
-      Har du ikke en konto? 
+      {{ t('login.noAccount') }}
       <RouterLink :to="{ path: '/onboarding', query: { redirect: route.query.redirect } }">
-        Opret bruger
+        {{ t('common.signup') }}
       </RouterLink>
     </p>
   </section>
