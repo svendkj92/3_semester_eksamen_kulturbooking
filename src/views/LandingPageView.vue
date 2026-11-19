@@ -206,10 +206,12 @@ onUnmounted(() => {
     font-weight: 700;
     line-height: 1.1;
     color: $background-color;
+    font-family: $font-heading;
   }
     p {
     font-size: clamp(1rem, 2vw, 1.5rem);
     color: $background-color;
+    font-family: $font-body;
     margin: 0 clamp(2rem, 10vw, 50%);
     line-height: 1.25;
   }
@@ -291,12 +293,14 @@ onUnmounted(() => {
 
   h2 {
     color: $hero-text-color;
+    font-family: $font-heading;
     font-size: clamp(0.8rem, 2vw, 1.5rem);
     font-weight: bold;
   }
 
   p {
     color: $hero-text-color;
+    font-family: $font-body;
     font-size: clamp(0.7rem, 1vw, 1.5rem);
     line-height: 1.25;
     margin: 1rem;
@@ -319,19 +323,31 @@ onUnmounted(() => {
 
 .upcoming-events {
   padding: 4rem 5%;
-  text-align: center;
+    :deep(.events-container) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+
+  :deep(.event-card) {
+    flex: 0 1 350px;
+  }
 
   &__header {
     margin-bottom: 2rem;
+    text-align: center;
 
     h2 {
       color: $hero-text-color;
+      font-family: $font-heading;
       font-size: clamp(1.8rem, 4vw, 2.5rem);
       margin-bottom: 0.75rem;
     }
 
     p {
       color: $hero-text-color;
+      font-family: $font-body;
       opacity: 0.8;
     }
   }
@@ -343,6 +359,10 @@ onUnmounted(() => {
 
   .cta-button {
     margin-top: 2.5rem;
+    display: table;
+    margin: 2.5rem auto 0;
+    font-family: $font-body;
+    border-radius: $radius-button;
   }
 }
 
@@ -362,6 +382,7 @@ onUnmounted(() => {
   gap: 1rem;
   p {
     color: $hero-text-color;
+    font-family: $font-body;
     font-style: italic;
     color: $background-color;
   }
@@ -381,7 +402,7 @@ onUnmounted(() => {
   margin-top: 1.5rem;
   background-color: $cta-color;
   color: $hero-text-color;
-  border-radius: 8px;
+  border-radius: $radius-button;
   text-decoration: none;
 }
 
@@ -391,8 +412,15 @@ onUnmounted(() => {
   max-width: 800px;
   text-align: center;
 
-  h2, p {
+  h2 {
+    font-family: $font-heading;
     color: $hero-text-color;
+  } 
+  
+  p {
+    color: $hero-text-color;
+    font-family: $font-body;
+    margin: 2rem 0;
   }
 }
 
