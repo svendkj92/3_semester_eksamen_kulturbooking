@@ -549,14 +549,14 @@ async function finishOnboarding() {
 .divider {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: $space-3;
 
   &::before,
   &::after {
     content: "";
     flex: 1;
-    height: 1px;
-    background-color: #64748B;
+    height: $border-width-input;
+    background-color: $secondary-color;
   }
 }
 
@@ -581,9 +581,11 @@ async function finishOnboarding() {
   }
 }
 
-email-login label {
+.email-login label {
+  font-family: $font-body;
   font-weight: $font-weight-bold;
   font-size: $font-size-label;
+  color: $hero-text-color;
 }
 
 .name-field,
@@ -594,10 +596,20 @@ email-login label {
 }
 
 .email-error {
-  color: #DC2626;
+  color: $error-color;
 }
 .email-success {
-  color: #166534;
+  color: $success-color;
 }
 
+.signup-content {
+  input:focus-visible,
+  button:focus-visible, 
+  a:focus-visible {
+    outline: none;
+    box-shadow: 
+    0 0 0 $focus-ring-inner $focus-ring-color, 
+    0 0 0 ($focus-ring-outer + $focus-ring-inner) $focus-ring--outer-color;
+  }
+}
 </style>
