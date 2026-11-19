@@ -546,6 +546,15 @@ async function finishOnboarding() {
   gap: $space-3;
 }
 
+.social-login button {
+  width: 100%;
+  min-height: $min-touch-target;
+  padding: $space-2 $space-3;
+  border-radius: $radius-button;
+  font: inherit;
+  cursor: pointer;
+}
+
 .divider {
   display: flex;
   align-items: center;
@@ -588,6 +597,33 @@ async function finishOnboarding() {
   color: $hero-text-color;
 }
 
+.email-login button[type="submit"] {
+  width: 100%;
+  min-height: $min-touch-target;
+  padding: $space-2 $space-3;
+  margin-top: $space-2;
+
+  border: none;
+  border-radius: $radius-button;
+
+  background-color: $cta-color;
+  color: $hero-text-color;
+
+  font-family: $font-body;
+  font-size: $font-size-body;
+  font-weight: $font-weight-bold;
+
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $cta-color-hover;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
 .name-field,
 .password-field {
   display: flex;
@@ -608,8 +644,8 @@ async function finishOnboarding() {
   a:focus-visible {
     outline: none;
     box-shadow: 
-    0 0 0 $focus-ring-inner $focus-ring-color, 
-    0 0 0 ($focus-ring-outer + $focus-ring-inner) $focus-ring--outer-color;
+    0 0 0 $focus-ring-inner $focus-ring-inner-color, 
+    0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
   }
 }
 </style>
