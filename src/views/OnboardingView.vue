@@ -107,12 +107,12 @@ onUnmounted(() => {
 
 async function handleSignup() {
   if (
-  !isFormValid.value ||
-  isSigningUp.value ||
-  registeredUser.value ||
-  verificationEmailSent.value
+    !isFormValid.value ||
+    isSigningUp.value ||
+    registeredUser.value ||
+    verificationEmailSent.value
   ) {
-  return
+    return
   }
 
   isSigningUp.value = true
@@ -133,26 +133,26 @@ async function handleSignup() {
   } catch (error) {
     console.error('Signup failed:', error.code || error.message)
 
-   if (registeredUser.value) {
-  signupError.value = 'onboarding.errors.verificationSendAfterSignup'
-  } else {
-    switch (error.code) {
-      case 'auth/email-already-in-use':
-        signupError.value = 'onboarding.errors.emailInUse'
-        break
-      case 'auth/invalid-email':
-        signupError.value = 'onboarding.errors.invalidEmail'
-        break
-      case 'auth/weak-password':
-        signupError.value = 'onboarding.errors.weakPassword'
-        break
-      case 'auth/network-request-failed':
-        signupError.value = 'onboarding.errors.network'
-        break
-      default:
-        signupError.value = 'onboarding.errors.signup'
+    if (registeredUser.value) {
+      signupError.value = 'onboarding.errors.verificationSendAfterSignup'
+    } else {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          signupError.value = 'onboarding.errors.emailInUse'
+          break
+        case 'auth/invalid-email':
+          signupError.value = 'onboarding.errors.invalidEmail'
+          break
+        case 'auth/weak-password':
+          signupError.value = 'onboarding.errors.weakPassword'
+          break
+        case 'auth/network-request-failed':
+          signupError.value = 'onboarding.errors.network'
+          break
+        default:
+          signupError.value = 'onboarding.errors.signup'
+      }
     }
-  }
   } finally {
     isSigningUp.value = false
   }
@@ -177,7 +177,7 @@ async function resendVerificationEmail() {
   } catch (error) {
     verificationEmailResent.value = false
     console.error('Verification email failed:', error)
-    
+
     signupError.value = 'onboarding.errors.verificationSend'
   } finally {
     isSigningUp.value = false
@@ -256,8 +256,8 @@ async function finishOnboarding() {
 
     const redirect = route.query.redirect
     const isEventPath =
-     typeof redirect === 'string' &&
-     /^\/events\/[^/?#]+$/.test(redirect)
+      typeof redirect === 'string' &&
+      /^\/events\/[^/?#]+$/.test(redirect)
 
     await router.push(isEventPath ? redirect : '/profile')
   } catch (error) {
@@ -273,236 +273,171 @@ async function finishOnboarding() {
 
 <template>
   <div class="signup-page">
-    
-     <section class="signup-content">
 
-        <h1>{{ t('onboarding.welcome') }}</h1>
+    <section class="signup-content">
 
-        <div class="social-login">
+      <h1>{{ t('onboarding.welcome') }}</h1>
 
-          <button type="button">
-            {{ t('onboarding.continueApple') }}
-          </button>
+      <div class="social-login">
 
-          <button type="button">
-            {{ t('onboarding.continueGoogle') }}
-          </button>
+        <button type="button">
+          {{ t('onboarding.continueApple') }}
+        </button>
+
+        <button type="button">
+          {{ t('onboarding.continueGoogle') }}
+        </button>
+
+      </div>
+
+      <div class="divider">
+        <span>{{ t('onboarding.or') }}</span>
+      </div>
+
+      <form class="email-login" novalidate @submit.prevent="handleSignup">
+
+        <div class="name-field">
+
+          <label for="name">{{ t('onboarding.name') }}</label>
+
+          <input id="name" v-model="name" type="text" autocomplete="name" :placeholder="t('onboarding.namePlaceholder')"
+            required @blur="nameTouched = true" :class="{ 'input-error': nameTouched && !isNameValid }" />
+
+          <p v-if="nameTouched && !isNameValid" class="email-error">
+            {{ t('onboarding.nameRequired') }}
+          </p>
 
         </div>
 
-        <div class="divider">
-          <span>{{ t('onboarding.or') }}</span>
-        </div>
+        <label for="email">{{ t('onboarding.email') }}</label>
 
-        <form class="email-login" novalidate @submit.prevent="handleSignup">
-
-          <div class="name-field">
-
-            <label for="name">{{ t('onboarding.name') }}</label>
-
-            <input
-              id="name"
-              v-model="name"
-              type="text"
-              autocomplete="name"
-              :placeholder="t('onboarding.namePlaceholder')"
-              required
-              @blur="nameTouched = true"
-              :class="{ 'input-error': nameTouched && !isNameValid }"
-            />
-
-            <p
-              v-if="nameTouched && !isNameValid"
-              class="email-error">
-              {{ t('onboarding.nameRequired') }}
-            </p>
-
-          </div>
-
-          <label for="email">{{ t('onboarding.email') }}</label>
-
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            autocomplete="email"
-            :placeholder="t('onboarding.emailPlaceholder')"
-            @blur="emailTouched = true"
-            :class="{
+        <input id="email" v-model="email" type="email" autocomplete="email"
+          :placeholder="t('onboarding.emailPlaceholder')" @blur="emailTouched = true" :class="{
             'input-error': emailTouched && email && !isEmailValid
-            }"
-          />
+          }" />
 
-          <p
-            v-if="emailTouched && email && !isEmailValid"
-            class="email-error">
-            {{ t('onboarding.emailInvalid') }}
-          </p>
-              
-          <div class="password-field">
-
-            <label for="password">{{ t('onboarding.password') }}</label>
-
-            <input
-              id="password"
-              v-model="password"
-              type="password"
-              autocomplete="new-password"
-              :placeholder="t('onboarding.passwordPlaceholder')"
-              minlength="6"
-              required
-              @blur="passwordTouched = true"
-              :class="{ 'input-error': passwordTouched && !isPasswordValid && !verificationEmailSent }"
-            />
-
-            <p
-              v-if="passwordTouched && !isPasswordValid && !verificationEmailSent"
-              class="email-error">
-              {{ t('onboarding.errors.weakPassword') }}
-            </p>
-
-          </div>
-
-          <p class="privacy-policy">
-            {{ t('onboarding.privacyBefore') }}
-            <a href="#">{{ t('onboarding.privacyLink') }}</a>{{ t('onboarding.privacyAfter') }}
-          </p>
-
-          <button
-            type="submit"
-            :disabled="!isFormValid || isSigningUp || registeredUser || verificationEmailSent"
-          >
-           {{ t(isSigningUp ? 'onboarding.creatingAccount' : 'onboarding.createAccount') }}
-          </button>
-
-          <p v-if="signupError" class="email-error" role="alert">
-            {{ t(signupError) }}
-          </p>
-
-          <p
-           v-if="verificationEmailSent && !emailVerified"
-           class="email-success"
-           role="status"
-          >
-           {{ t('onboarding.verificationSent', { email }) }}
-          </p>
-
-          <button
-            v-if="registeredUser && !emailVerified"
-            type="button"
-            @click="resendVerificationEmail"
-            :disabled="isSigningUp"
-          >
-            {{ t('onboarding.resendVerification') }}
-          </button>
-
-          <p
-           v-if="verificationEmailResent && !emailVerified"
-           class="email-success"
-           role="status"
-          >
-           {{ t('onboarding.verificationResent', { email }) }}
-          </p>
-
-          <p 
-           v-if="registeredUser && !emailVerified && !verificationEmailSent"
-           role="status"
-          >
-           {{ t('onboarding.verificationPending') }}
-          </p>
-
-          <button
-            v-if="registeredUser && !emailVerified"
-            type="button"
-            @click="checkEmailVerification"
-            :disabled="isCheckingVerification"
-          >
-            {{ t(isCheckingVerification ? 'onboarding.checking' : 'onboarding.confirmVerified') }}
-          </button>
-
-        </form>
-
-        <p 
-         v-if="isCheckingProfile"
-          class="profile-loading"
-          role="status"
-        >
-          {{ t('onboarding.checkingProfile') }}
+        <p v-if="emailTouched && email && !isEmailValid" class="email-error">
+          {{ t('onboarding.emailInvalid') }}
         </p>
 
-        <div 
-          v-if="emailVerified && !hasExistingProfile && !isCheckingProfile && isOnboardingOpen"
-          class="onboarding-overlay">
+        <div class="password-field">
 
-          <button
-            type="button"
-            :aria-label="t('onboarding.skipAndSave')"
-            @click="closeOnboarding"
-            :disabled="isSavingProfile"
-          >
-           {{ isSavingProfile ? '...' : '×' }}
-          </button>
+          <label for="password">{{ t('onboarding.password') }}</label>
 
-          <p class="onboarding-progress">
-            {{ t('onboarding.progress', { currentStep }) }}
+          <input id="password" v-model="password" type="password" autocomplete="new-password"
+            :placeholder="t('onboarding.passwordPlaceholder')" minlength="6" required @blur="passwordTouched = true"
+            :class="{ 'input-error': passwordTouched && !isPasswordValid && !verificationEmailSent }" />
+
+          <p v-if="passwordTouched && !isPasswordValid && !verificationEmailSent" class="email-error">
+            {{ t('onboarding.errors.weakPassword') }}
           </p>
 
-          <OnboardingRoleSelection 
-            v-if="currentStep === 1"
-            v-model="selectedRole"
-          />
-          <OnboardingInterestSelection 
-            v-else-if="currentStep === 2" 
-            v-model="selectedInterests"
-          />
-          <OnboardingProfileSetup 
-            v-else-if="currentStep === 3" 
-            v-model:bio="profileBio"
-            v-model:image="profileImage"
-          />
+        </div>
 
-          <div class="onboarding-navigation">
+        <p class="privacy-policy">
+          {{ t('onboarding.privacyBefore') }}
+          <a href="#">{{ t('onboarding.privacyLink') }}</a>{{ t('onboarding.privacyAfter') }}
+        </p>
 
-            <p
-              v-if="isSavingProfile"
-              class="profile-loading"
-              role="status"
-            >
-              {{ t('onboarding.savingProfile') }}
-            </p>
+        <button type="submit" :disabled="!isFormValid || isSigningUp || registeredUser || verificationEmailSent">
+          {{ t(isSigningUp ? 'onboarding.creatingAccount' : 'onboarding.createAccount') }}
+        </button>
 
-            <button
-              v-if="currentStep > 1"
-              @click="previousStep"
-              :disabled="isSavingProfile"
-            >
-              {{ t('onboarding.back') }}
-            </button>
+        <p v-if="signupError" class="email-error" role="alert">
+          {{ t(signupError) }}
+        </p>
 
-            <button
-              v-if="currentStep < 3"
-              @click="nextStep"
-              :disabled="isSavingProfile"
-            >
-              {{ t('onboarding.next') }}
-            </button>
+        <p v-if="verificationEmailSent && !emailVerified" class="email-success" role="status">
+          {{ t('onboarding.verificationSent', { email }) }}
+        </p>
 
-            <button
-              v-if="currentStep === 3"
-              @click="finishOnboarding"
-              type="button"
-              :disabled="isSavingProfile"
-            >
-              {{ t(isSavingProfile ? 'onboarding.savingProfile' : 'onboarding.finish') }}
-            </button>
+        <button v-if="registeredUser && !emailVerified" type="button" @click="resendVerificationEmail"
+          :disabled="isSigningUp">
+          {{ t('onboarding.resendVerification') }}
+        </button>
 
-            <p v-if="profileSaveError" 
-            class="email-error" 
-            role="alert">
-              {{ t(profileSaveError) }}
-            </p>
+        <p v-if="verificationEmailResent && !emailVerified" class="email-success" role="status">
+          {{ t('onboarding.verificationResent', { email }) }}
+        </p>
+
+        <p v-if="registeredUser && !emailVerified && !verificationEmailSent" role="status">
+          {{ t('onboarding.verificationPending') }}
+        </p>
+
+        <button v-if="registeredUser && !emailVerified" type="button" @click="checkEmailVerification"
+          :disabled="isCheckingVerification">
+          {{ t(isCheckingVerification ? 'onboarding.checking' : 'onboarding.confirmVerified') }}
+        </button>
+
+      </form>
+
+      <p v-if="isCheckingProfile" class="profile-loading" role="status">
+        {{ t('onboarding.checkingProfile') }}
+      </p>
+
+      <div v-if="emailVerified && !hasExistingProfile && !isCheckingProfile && isOnboardingOpen"
+        class="onboarding-overlay">
+
+        <button type="button" :aria-label="t('onboarding.skipAndSave')" @click="closeOnboarding"
+          :disabled="isSavingProfile">
+          {{ isSavingProfile ? '...' : '×' }}
+        </button>
+
+        <div class="onboarding-progress">
+          <p>{{ t('onboarding.progress', { currentStep }) }}</p>
+
+          <div class="progress-steps" role="progressbar" :aria-label="t('onboarding.progress', { currentStep })"
+            :aria-valuenow="currentStep" aria-valuemin="1" aria-valuemax="3">
+            <span v-for="step in 3" :key="step" class="progress-step"
+              :class="{ 'progress-step--active': step === currentStep }" aria-hidden="true"></span>
           </div>
         </div>
+
+        <OnboardingRoleSelection v-if="currentStep === 1" v-model="selectedRole" />
+        <OnboardingInterestSelection v-else-if="currentStep === 2" v-model="selectedInterests" />
+        <OnboardingProfileSetup v-else-if="currentStep === 3" v-model:bio="profileBio" v-model:image="profileImage" />
+
+        <div class="onboarding-navigation">
+
+          <p v-if="isSavingProfile" class="profile-loading" role="status">
+            {{ t('onboarding.savingProfile') }}
+          </p>
+
+          
+<button
+  v-if="currentStep > 1"
+  class="onboarding-back"
+  @click="previousStep"
+  :disabled="isSavingProfile"
+>
+  {{ t('onboarding.back') }}
+</button>
+
+<button
+  v-if="currentStep < 3"
+  class="onboarding-next"
+  @click="nextStep"
+  :disabled="isSavingProfile"
+>
+  {{ t('onboarding.next') }}
+</button>
+
+<button
+  v-if="currentStep === 3"
+  class="onboarding-next"
+  @click="finishOnboarding"
+  type="button"
+  :disabled="isSavingProfile"
+>
+  {{ t(isSavingProfile ? 'onboarding.savingProfile' : 'onboarding.finish') }}
+</button>
+
+
+          <p v-if="profileSaveError" class="email-error" role="alert">
+            {{ t(profileSaveError) }}
+          </p>
+        </div>
+      </div>
     </section>
 
     <div class="signup-image" aria-hidden="true">
@@ -631,24 +566,128 @@ async function finishOnboarding() {
 .email-error {
   color: $error-color;
 }
+
 .email-success {
   color: $success-color;
 }
 
 .signup-content {
+
   input:focus-visible,
-  button:focus-visible, 
+  button:focus-visible,
   a:focus-visible {
     outline: none;
-    box-shadow: 
-    0 0 0 $focus-ring-inner $focus-ring-inner-color, 
-    0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
+    box-shadow:
+      0 0 0 $focus-ring-inner $focus-ring-inner-color,
+      0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
   }
 }
 
 .signup-image {
   display: none;
 }
+
+
+.onboarding-progress {
+  margin-bottom: $space-4;
+
+  p {
+    margin-bottom: $space-3;
+    font-family: $font-body;
+    font-size: $font-size-label;
+    color: $hero-text-color;
+  }
+}
+
+
+.progress-steps {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  min-height: 24px;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: $hero-text-color;
+    transform: translateY(-50%);
+  }
+}
+
+.progress-step {
+  position: relative;
+  z-index: 1;
+
+  width: 24px;
+  height: 18px;
+  border: 1px solid $hero-text-color;
+  border-radius: 50%;
+  background-color: $background-color;
+}
+
+.progress-step--active {
+  background-color: $primary-color;
+}
+
+
+
+.onboarding-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-5;
+
+  button {
+    min-height: $min-touch-target;
+    padding: $space-2 $space-4;
+    border: none;
+    border-radius: $radius-button;
+    font-family: $font-body;
+    font-size: $font-size-body;
+    font-weight: $font-weight-bold;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow:
+        0 0 0 $focus-ring-inner $focus-ring-inner-color,
+        0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
+    }
+  }
+
+  .onboarding-back {
+    background-color: $primary-color;
+    color: #FFFFFF;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-color-hover;
+    }
+  }
+
+  .onboarding-next {
+    background-color: $cta-color;
+    color: $hero-text-color;
+
+    &:hover:not(:disabled) {
+      background-color: $cta-color-hover;
+    }
+  }
+
+  .profile-loading,
+  .email-error {
+    width: 100%;
+  }
+}
+
 
 @media (min-width: $breakpoint-tablet) {
   .signup-page {
@@ -663,6 +702,7 @@ async function finishOnboarding() {
     padding: $space-5 $page-margin-tablet $space-6;
   }
 }
+
 @media (min-width: $breakpoint-desktop) {
   .signup-page {
     display: grid;
@@ -690,8 +730,7 @@ async function finishOnboarding() {
   }
 
   .signup-page {
-  min-height: 100vh;
+    min-height: 100vh;
   }
 }
-
 </style>
