@@ -70,5 +70,5 @@ $focus-ring-inner-color: #FFFFFF;
 $focus-ring-outer-color: #000000;
 
 // Image ratios
-$profile-image-ratio: 1 / 1;
-$event-image-ratio: 16 / 9;
+$profile-image-ratio: unquote("1 / 1");
+$event-image-ratio: unquote("16 / 9");
