@@ -33,6 +33,7 @@ export const daOnboarding = {
   interestsTitle: 'Vælg dine interesser',
   roles: {
     title: 'Vælg din rolle',
+    defaultInfo: 'Hvis du ikke vælger en rolle, bliver du automatisk registreret som Udforsker.',
     udforsker: {
       label: 'Udforsker',
       description: 'Jeg vil opdage nye oplevelser, møde andre og deltage i events.'
@@ -106,6 +107,7 @@ export const enOnboarding = {
   interestsTitle: 'Choose your interests',
   roles: {
     title: 'Choose your role',
+    defaultInfo: 'If you do not choose a role, you will automatically be registered as an Explorer.',
     udforsker: {
       label: 'Explorer',
       description: 'I want to discover new experiences, meet others and participate in events.'
