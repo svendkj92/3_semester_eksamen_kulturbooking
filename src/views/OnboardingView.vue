@@ -651,17 +651,18 @@ async function finishOnboarding() {
 }
 
 @media (min-width: $breakpoint-tablet) {
+  .signup-page {
+    min-height: 0;
+    width: 100%;
+  }
+
   .signup-content {
-    max-width: 100%;
-    min-width: 0;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
     padding: $space-5 $page-margin-tablet $space-6;
   }
-
-  .signup-page {
-  min-height: 0;
-  }
 }
-
 @media (min-width: $breakpoint-desktop) {
   .signup-page {
     display: grid;
