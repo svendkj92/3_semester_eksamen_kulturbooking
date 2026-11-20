@@ -504,6 +504,11 @@ async function finishOnboarding() {
           </div>
         </div>
     </section>
+
+    <div class="signup-image" aria-hidden="true">
+      <img src="@/assets/img/hero_image.jpg" alt="" />
+    </div>
+
   </div>
 </template>
 
@@ -640,4 +645,52 @@ async function finishOnboarding() {
     0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
   }
 }
+
+.signup-image {
+  display: none;
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .signup-content {
+    max-width: 100%;
+    min-width: 0;
+    padding: $space-5 $page-margin-tablet $space-6;
+  }
+
+  .signup-page {
+  min-height: 0;
+  }
+}
+
+@media (min-width: $breakpoint-desktop) {
+  .signup-page {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .signup-content {
+    max-width: 100%;
+    padding: $space-6 $page-margin-desktop;
+  }
+
+  .signup-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    padding: $space-4;
+  }
+
+  .signup-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .signup-page {
+  min-height: 100vh;
+  }
+}
+
 </style>
