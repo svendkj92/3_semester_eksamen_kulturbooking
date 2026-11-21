@@ -658,21 +658,6 @@ async function finishOnboarding() {
   }
 }
 
-
-.onboarding-progress {
-  margin-bottom: $space-4;
-  padding-top: $space-5;
-
-  p {
-    margin-bottom: $space-3;
-    font-family: $font-body;
-    font-size: $font-size-label;
-    color: $hero-text-color;
-  }
-}
-
-
-
 .progress-steps {
   position: relative;
   display: flex;
