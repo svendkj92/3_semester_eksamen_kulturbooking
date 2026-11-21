@@ -32,6 +32,7 @@ export const daOnboarding = {
   finish: 'Afslut',
   interestsTitle: 'Vælg dine interesser',
   roles: {
+    toggleDescription: 'Vis eller skjul beskrivelsen af {role}',
     title: 'Vælg din rolle',
     defaultInfo: 'Hvis du ikke vælger en rolle, bliver du automatisk registreret som Udforsker.',
     udforsker: {
@@ -106,6 +107,7 @@ export const enOnboarding = {
   finish: 'Finish',
   interestsTitle: 'Choose your interests',
   roles: {
+    toggleDescription: 'Show or hide the description of {role}',
     title: 'Choose your role',
     defaultInfo: 'If you do not choose a role, you will automatically be registered as an Explorer.',
     udforsker: {
