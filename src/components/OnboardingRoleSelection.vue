@@ -33,7 +33,7 @@ function toggleRoleDescription(role) {
       {{ t('onboarding.roles.defaultInfo') }}
     </p>
 
-    <div class="role-option">
+    <div class="role-option" role="radiogroup" aria-labelledby="role-title">
       <div
         v-for="role in roles"
         :key="role.value"
