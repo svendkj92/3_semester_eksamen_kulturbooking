@@ -11,10 +11,7 @@ const { t } = useI18n()
 
     <header class="onboarding-header">
       <RouterLink to="/">
-        <img
-          src="@/assets/kb_logo.png"
-          :alt="t('onboarding.brand')"
-        />
+        <img src="@/assets/kb_logo.png" :alt="t('onboarding.brand')" />
       </RouterLink>
       <LanguageSwitcher />
     </header>
@@ -48,7 +45,7 @@ const { t } = useI18n()
     min-height: 100vh;
   }
 
-  .onboarding-layout > main {
+  .onboarding-layout>main {
     flex: 1;
     min-width: 0;
     width: 100%;
@@ -64,7 +61,7 @@ const { t } = useI18n()
     min-height: 0;
   }
 
-  .onboarding-layout > main {
+  .onboarding-layout>main {
     display: block;
     width: auto;
   }

@@ -27,17 +27,8 @@ const roles = [
     </p>
 
     <div class="role-option" role="radiogroup" aria-labelledby="role-title">
-      <label
-        v-for="role in roles"
-        :key="role.value"
-        class="role-label"
-      >
-        <input
-          v-model="selectedRole"
-          type="radio"
-          name="role"
-          :value="role.value"
-        />
+      <label v-for="role in roles" :key="role.value" class="role-label">
+        <input v-model="selectedRole" type="radio" name="role" :value="role.value" />
 
         <span class="role-name">
           {{ t('onboarding.roles.' + role.value + '.label') }}
@@ -128,4 +119,3 @@ const roles = [
   }
 }
 </style>
-

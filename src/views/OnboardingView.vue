@@ -403,34 +403,19 @@ async function finishOnboarding() {
             {{ t('onboarding.savingProfile') }}
           </p>
 
-          
-<button
-  v-if="currentStep > 1"
-  class="onboarding-back"
-  @click="previousStep"
-  :disabled="isSavingProfile"
->
-  {{ t('onboarding.back') }}
-</button>
 
-<button
-  v-if="currentStep < 3"
-  class="onboarding-next"
-  @click="nextStep"
-  :disabled="isSavingProfile"
->
-  {{ t('onboarding.next') }}
-</button>
+          <button v-if="currentStep > 1" class="onboarding-back" @click="previousStep" :disabled="isSavingProfile">
+            {{ t('onboarding.back') }}
+          </button>
 
-<button
-  v-if="currentStep === 3"
-  class="onboarding-next"
-  @click="finishOnboarding"
-  type="button"
-  :disabled="isSavingProfile"
->
-  {{ t(isSavingProfile ? 'onboarding.savingProfile' : 'onboarding.finish') }}
-</button>
+          <button v-if="currentStep < 3" class="onboarding-next" @click="nextStep" :disabled="isSavingProfile">
+            {{ t('onboarding.next') }}
+          </button>
+
+          <button v-if="currentStep === 3" class="onboarding-next" @click="finishOnboarding" type="button"
+            :disabled="isSavingProfile">
+            {{ t(isSavingProfile ? 'onboarding.savingProfile' : 'onboarding.finish') }}
+          </button>
 
 
           <p v-if="profileSaveError" class="email-error" role="alert">
