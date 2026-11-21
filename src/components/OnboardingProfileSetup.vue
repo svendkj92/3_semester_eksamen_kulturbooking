@@ -87,6 +87,88 @@ onUnmounted(() => {
     </section>
 </template>
 
-<style lang="scss" scoped>
 
+<style lang="scss" scoped>
+@use "@/assets/variables" as *;
+
+.profile-setup {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  color: $hero-text-color;
+}
+
+.profile-setup h2 {
+  font-family: $font-body;
+  font-size: $font-size-subtitle;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-subtitle;
+}
+
+.profile-image,
+.profile-bio {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.profile-image label,
+.profile-bio label {
+  font-family: $font-body;
+  font-size: $font-size-label;
+  font-weight: $font-weight-bold;
+}
+
+.profile-image input,
+.profile-bio textarea {
+  width: 100%;
+  padding: $space-2 $space-3;
+  border: $border-width-input solid $hero-text-color;
+  border-radius: $radius-input;
+  background-color: #FFFFFF;
+  color: $hero-text-color;
+  font: inherit;
+}
+
+.profile-image input {
+  min-height: $min-touch-target;
+}
+
+.profile-bio textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.profile-preview {
+  display: block;
+  width: 120px;
+  aspect-ratio: $profile-image-ratio;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.profile-image button {
+  align-self: flex-start;
+  min-height: $min-touch-target;
+  padding: $space-2 $space-3;
+  border: none;
+  border-radius: $radius-button;
+  background-color: $primary-color;
+  color: #FFFFFF;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $primary-color-hover;
+  }
+}
+
+.profile-image input:focus-visible,
+.profile-bio textarea:focus-visible,
+.profile-image button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 $focus-ring-inner $focus-ring-inner-color,
+    0 0 0 ($focus-ring-inner + $focus-ring-outer) $focus-ring-outer-color;
+}
 </style>

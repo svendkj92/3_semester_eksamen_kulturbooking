@@ -50,7 +50,7 @@ const selectedInterests = defineModel({
     line-height: $line-height-subtitle;
     margin-bottom: $space-4;
   }
-}F
+}
 
 .interest-options {
   display: flex;
