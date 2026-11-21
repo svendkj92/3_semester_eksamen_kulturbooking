@@ -222,10 +222,21 @@ function nextStep() {
     currentStep.value++
   }
 }
+
 function previousStep() {
   if (currentStep.value > 1) {
     currentStep.value--
   }
+}
+
+function goToStep(step) {
+  if (isSavingProfile.value || step < 1 || step > 3) return
+
+  if (step > 1 && !selectedRole.value) {
+    selectedRole.value = 'udforsker'
+  }
+
+  currentStep.value = step
 }
 
 function closeOnboarding() {
@@ -377,21 +388,33 @@ async function finishOnboarding() {
 
       <div v-if="emailVerified && !hasExistingProfile && !isCheckingProfile && isOnboardingOpen"
         class="onboarding-overlay">
+        <div class="onboarding-panel">
 
-        <button type="button" :aria-label="t('onboarding.skipAndSave')" @click="closeOnboarding"
-          :disabled="isSavingProfile">
-          {{ isSavingProfile ? '...' : '×' }}
-        </button>
+        <button
+  type="button"
+  class="onboarding-close"
+  :aria-label="t('onboarding.skipAndSave')"
+  @click="closeOnboarding"
+  :disabled="isSavingProfile"
+>
+  {{ isSavingProfile ? '...' : '×' }}
+</button>
 
-        <div class="onboarding-progress">
-          <p>{{ t('onboarding.progress', { currentStep }) }}</p>
+        
+<div class="progress-steps" role="navigation" aria-label="Onboarding">
+  <button
+    v-for="step in 3"
+    :key="step"
+    type="button"
+    class="progress-step"
+    :class="{ 'progress-step--active': step === currentStep }"
+    :aria-label="t('onboarding.progress', { currentStep: step })"
+    :aria-current="step === currentStep ? 'step' : undefined"
+    :disabled="isSavingProfile"
+    @click="goToStep(step)"
+  ></button>
+</div>
 
-          <div class="progress-steps" role="progressbar" :aria-label="t('onboarding.progress', { currentStep })"
-            :aria-valuenow="currentStep" aria-valuemin="1" aria-valuemax="3">
-            <span v-for="step in 3" :key="step" class="progress-step"
-              :class="{ 'progress-step--active': step === currentStep }" aria-hidden="true"></span>
-          </div>
-        </div>
 
         <OnboardingRoleSelection v-if="currentStep === 1" v-model="selectedRole" />
         <OnboardingInterestSelection v-else-if="currentStep === 2" v-model="selectedInterests" />
@@ -421,6 +444,7 @@ async function finishOnboarding() {
           <p v-if="profileSaveError" class="email-error" role="alert">
             {{ t(profileSaveError) }}
           </p>
+        </div>
         </div>
       </div>
     </section>
@@ -573,8 +597,71 @@ async function finishOnboarding() {
 }
 
 
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: $space-3;
+  background-color: rgba($hero-text-color, 0.65);
+  overflow-y: auto;
+}
+
+.onboarding-panel {
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100dvh - 2 * #{$space-3});
+  overflow-y: auto;
+    position: relative;
+
+  padding: $space-5;
+  border-radius: $radius-card;
+  background-color: $background-color;
+}
+
+
+.onboarding-close {
+  position: absolute;
+  top: $space-3;
+  right: $space-3;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: $min-touch-target;
+  height: $min-touch-target;
+
+  padding: 0;
+  border: none;
+  border-radius: $radius-button;
+  background-color: transparent;
+
+  color: $hero-text-color;
+  font-family: $font-body;
+  font-size: 1.75rem;
+  line-height: 1;
+
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($primary-color, 0.1);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+
 .onboarding-progress {
   margin-bottom: $space-4;
+  padding-top: $space-5;
 
   p {
     margin-bottom: $space-3;
@@ -585,12 +672,13 @@ async function finishOnboarding() {
 }
 
 
+
 .progress-steps {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  min-height: 24px;
+  min-height: $min-touch-target;
 
   &::before {
     content: "";
@@ -608,14 +696,36 @@ async function finishOnboarding() {
   position: relative;
   z-index: 1;
 
-  width: 24px;
-  height: 18px;
-  border: 1px solid $hero-text-color;
-  border-radius: 50%;
-  background-color: $background-color;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: $min-touch-target;
+  height: $min-touch-target;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+
+  &::before {
+    content: "";
+    width: 24px;
+    height: 18px;
+    border: 1px solid $hero-text-color;
+    border-radius: 50%;
+    background-color: $background-color;
+  }
+
+  &:hover:not(:disabled)::before {
+    border-color: $primary-color-hover;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 }
 
-.progress-step--active {
+.progress-step--active::before {
   background-color: $primary-color;
 }
 
