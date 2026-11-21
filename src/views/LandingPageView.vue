@@ -5,6 +5,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { interests } from '@/services/interestService';
 import { getEvents } from '@/services/eventService';
 import EventList from '@/components/EventList.vue';
+import EventDetailView from '@/views/EventDetailView.vue';
 import { useI18n } from 'vue-i18n';
 
 const { t, locale } = useI18n();
@@ -20,6 +21,15 @@ let interval = null;
 const events = ref([]);
 const isLoading = ref(true);
 const loadError = ref('');
+const selectedEventId = ref(null);
+
+function openEventDialog(event) {
+  selectedEventId.value = event.id;
+}
+
+function closeEventDialog() {
+  selectedEventId.value = null;
+}
 
 const upcomingEvents = computed(() => {
   const now = Date.now();
@@ -124,12 +134,20 @@ onUnmounted(() => {
           <EventList
             v-if="upcomingEvents.length"
             :events="upcomingEvents"
+            :open-in-dialog="true"
+            @view-event="openEventDialog"
           />
 
           <p v-else class="events-message">
             {{ t('landing.empty') }}
           </p>
         </template>
+
+        <EventDetailView
+          v-if="selectedEventId"
+          :event-id="selectedEventId"
+          @close="closeEventDialog"
+        />
 
         <RouterLink to="/events" class="cta-button">
           {{ t('landing.allEvents') }}

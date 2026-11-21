@@ -12,15 +12,29 @@ import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
 
 const { t, locale } = useI18n();
 const { eventDate, eventTime, eventPrice, interestLabel } = useEventFormatting();
+const props = defineProps({
+  eventId: {
+    type: String,
+    default: null,
+  },
+});
+
 const route = useRoute();
 const router = useRouter();
-const emit = defineEmits(['registration-changed']);
+const emit = defineEmits(['registration-changed', 'close']);
+
+const activeEventId = computed(() => props.eventId || route.params.id);
 const dialog = ref(null);
 let returnFocus;
 let previousOverflow;
 const parentRoute = computed(() => route.name === 'profile-event-detail' ? 'profile' : 'events');
 
 async function closeDialog() {
+  if (props.eventId) {
+    emit('close');
+    return;
+  }
+
   await router.push({ name: parentRoute.value });
 }
 const event = ref(null);
@@ -51,7 +65,7 @@ async function loadEvent() {
   registrationError.value = '';
   registrationMessage.value = '';
   try {
-    const data = await getEvent(route.params.id);
+    const data = await getEvent(activeEventId.value);
     const registrations = data && uid ? await getRegistrations(uid) : {};
     if (id !== requestId) return;
     event.value = data;
@@ -101,7 +115,7 @@ async function toggleRegistration() {
   }
 }
 
-watch([() => route.params.id, user, authReady], loadEvent);
+watch([activeEventId, user, authReady], loadEvent);
 
 onMounted(() => {
   returnFocus = document.activeElement;

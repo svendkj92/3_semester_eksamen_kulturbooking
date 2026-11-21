@@ -1,13 +1,18 @@
-
 <script setup>
 import EventCard from './EventCard.vue';
 
-defineProps({
+const props = defineProps({
   events: {
     type: Array,
     required: true,
   },
+  openInDialog: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits(['view-event']);
 </script>
 
 <template>
@@ -16,6 +21,8 @@ defineProps({
       v-for="event in events"
       :key="event.id"
       :event="event"
+      :open-in-dialog="props.openInDialog"
+      @view-event="emit('view-event', $event)"
     />
   </div>
 </template>
