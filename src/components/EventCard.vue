@@ -12,7 +12,13 @@ defineProps({
     type: Object,
     required: true,
   },
+  openInDialog: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+defineEmits(['view-event']);
 </script>
 
 <template>
@@ -44,7 +50,18 @@ defineProps({
         <span>{{ event.location }}</span>
       </div>
 
+      <button
+        v-if="openInDialog"
+        type="button"
+        class="event-card__link"
+        @click="$emit('view-event', event)"
+      >
+        {{ t('common.viewEvent') }}
+        <span aria-hidden="true">→</span>
+      </button>
+
       <RouterLink
+        v-else
         :to="`/events/${event.id}`"
         class="event-card__link"
         aria-haspopup="dialog"
@@ -148,9 +165,15 @@ defineProps({
     align-items: center;
     gap: 0.5rem;
     margin-top: 1rem;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
     color: $cta-color;
     font-weight: bold;
     text-decoration: none;
+    cursor: pointer;
+    text-align: left;
 
     &:hover {
       gap: 0.8rem;
