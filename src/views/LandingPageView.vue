@@ -294,7 +294,7 @@ onUnmounted(() => {
 
 .steps {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   justify-items: center;
   align-items: start;
   padding: 1rem 5%;
@@ -312,14 +312,14 @@ onUnmounted(() => {
   h2 {
     color: $hero-text-color;
     font-family: $font-heading;
-    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    font-size: clamp(1rem, 2vw, 1.7rem);
     font-weight: bold;
   }
 
   p {
     color: $hero-text-color;
     font-family: $font-body;
-    font-size: clamp(0.7rem, 1vw, 1.5rem);
+    font-size: clamp(0.8rem, 1vw, 1.5rem);
     line-height: 1.25;
     margin: 1rem;
   }
@@ -460,6 +460,10 @@ onUnmounted(() => {
 }
 
 @media (min-width: 768px) {
+
+  .steps {
+    grid-template-columns: repeat(3, 1fr);
+  }  
 
   .hero{
     min-height: 70vh;
