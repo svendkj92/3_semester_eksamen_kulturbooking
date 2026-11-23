@@ -10,9 +10,7 @@ const { t } = useI18n()
   <div class="onboarding-layout">
 
     <header class="onboarding-header">
-      <RouterLink to="/">
-        <img src="@/assets/kb_logo.png" :alt="t('onboarding.brand')" />
-      </RouterLink>
+      <img src="@/assets/kb_logo.png" :alt="t('onboarding.brand')" />
       <LanguageSwitcher />
     </header>
 

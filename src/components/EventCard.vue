@@ -129,7 +129,7 @@ defineEmits(['view-event']);
     border-radius: 50px;
     background-color: $background-color;
     color: $hero-text-color;
-    font-size: 0.8rem;
+    font-size: $font-size-label;
     font-weight: bold;
   }
 
@@ -143,7 +143,7 @@ defineEmits(['view-event']);
     gap: 0.4rem;
     color: $background-color;
     opacity: 0.7;
-    font-size: 0.85rem;
+    font-size: $font-size-label;
     margin-bottom: 1rem;
   }
 

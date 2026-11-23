@@ -65,9 +65,9 @@ onUnmounted(() => {
 <template>
   <header class="header" @keydown.esc="dismissMenu">
     <div class="header-bar">
-      <RouterLink class="logo" to="/" :aria-label="t('common.home')" @click="closeMenu">
-        <img src="@/assets/kb_logo.png" alt="" width="60" height="60" />
-      </RouterLink>
+      <div class="logo">
+  <img src="@/assets/kb_logo.png" alt="KulturBooking" width="60" height="60" />
+</div>
 
       <button
         ref="menuButton"

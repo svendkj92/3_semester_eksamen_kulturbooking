@@ -37,10 +37,10 @@ const sections = [
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <RouterLink class="footer-brand" to="/" :aria-label="t('common.home')">
-        <img src="@/assets/kb_logo.png" alt="" width="48" height="48" />
-        <span>KulturBooking</span>
-      </RouterLink>
+      <div class="footer-brand">
+  <img src="@/assets/kb_logo.png" alt="" width="48" height="48" />
+  <span>KulturBooking</span>
+</div>
 
       <nav class="footer-navigation" :aria-label="t('footer.navigation')">
         <div v-for="section in sections" :key="section.title" class="footer-section">
