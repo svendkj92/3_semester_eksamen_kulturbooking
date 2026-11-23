@@ -58,6 +58,7 @@ const profileImage = ref(null)
 const isSavingProfile = ref(false)
 const profileSaveError = ref('')
 let unsubscribeAuth = null
+let verificationInterval = null
 
 async function checkProfileStatus(user) {
   isCheckingProfile.value = true
@@ -80,6 +81,7 @@ async function checkProfileStatus(user) {
   }
 }
 
+
 onMounted(() => {
   unsubscribeAuth = observeAuthState((user) => {
     if (user) {
@@ -90,8 +92,11 @@ onMounted(() => {
       registeredUser.value = user
       email.value = user.email || ''
       emailVerified.value = user.emailVerified
+
       if (user.emailVerified) {
         void checkProfileStatus(user)
+      } else {
+        void checkEmailVerification()
       }
     } else {
       registeredUser.value = null
@@ -99,11 +104,23 @@ onMounted(() => {
       verificationEmailSent.value = false
     }
   })
+
+  verificationInterval = setInterval(() => {
+    if (
+      registeredUser.value &&
+      !emailVerified.value &&
+      !isCheckingVerification.value
+    ) {
+      void checkEmailVerification()
+    }
+  }, 3000)
 })
 
 onUnmounted(() => {
   unsubscribeAuth?.()
+  clearInterval(verificationInterval)
 })
+
 
 async function handleSignup() {
   if (
@@ -184,31 +201,24 @@ async function resendVerificationEmail() {
   }
 }
 
+
 async function checkEmailVerification() {
-  if (isCheckingVerification.value) return
+  if (isCheckingVerification.value || emailVerified.value) return
+
+  const user = auth.currentUser
+  if (!user) return
 
   isCheckingVerification.value = true
-  signupError.value = ''
 
   try {
-    const user = auth.currentUser
-
-    if (!user) {
-      signupError.value = 'onboarding.errors.notLoggedIn'
-      return
-    }
-
     await reload(user)
 
     if (user.emailVerified) {
       emailVerified.value = true
       await checkProfileStatus(user)
-    } else {
-      signupError.value = 'onboarding.errors.notVerified'
     }
   } catch (error) {
     console.error('Email verification check failed:', error)
-    signupError.value = 'onboarding.errors.verificationCheck'
   } finally {
     isCheckingVerification.value = false
   }
@@ -374,11 +384,6 @@ async function finishOnboarding() {
         <p v-if="registeredUser && !emailVerified && !verificationEmailSent" role="status">
           {{ t('onboarding.verificationPending') }}
         </p>
-
-        <button v-if="registeredUser && !emailVerified" type="button" @click="checkEmailVerification"
-          :disabled="isCheckingVerification">
-          {{ t(isCheckingVerification ? 'onboarding.checking' : 'onboarding.confirmVerified') }}
-        </button>
 
       </form>
 

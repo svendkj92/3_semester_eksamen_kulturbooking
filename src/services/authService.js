@@ -28,9 +28,16 @@ export async function registerUser(name, email, password) {
   return user;
 }
 
+
 export async function sendVerificationEmail(user) {
-  await sendEmailVerification(user);
+  const actionCodeSettings = {
+    url: `${window.location.origin}/onboarding`,
+    handleCodeInApp: false
+  };
+
+  await sendEmailVerification(user, actionCodeSettings);
 }
+
 
 // Login existing user
 export async function loginUser(email, password) {
