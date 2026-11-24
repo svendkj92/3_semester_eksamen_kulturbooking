@@ -7,6 +7,7 @@ import { getEvents } from '@/services/eventService';
 import EventList from '@/components/EventList.vue';
 import EventDetailView from '@/views/EventDetailView.vue';
 import { useI18n } from 'vue-i18n';
+import socialProofVideo from '@/assets/video/vibes.mp4';
 
 const { t, locale } = useI18n();
 const words = computed(() => interests.map((interest) =>
@@ -16,6 +17,9 @@ const currentIndex = ref(0);
 const currentWord = computed(() => words.value[currentIndex.value]);
 
 let interval = null;
+
+const videoElement = ref(null);
+let videoObserver = null;
 
 // Events
 const events = ref([]);
@@ -60,10 +64,30 @@ onMounted(() => {
   }, 3000);
 
   loadEvents();
+
+  videoObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          videoElement.value?.play();
+        } else {
+          videoElement.value?.pause();
+        }
+      });
+    },
+    {
+      threshold: 0.5,
+    }
+  );
+
+  if (videoElement.value) {
+    videoObserver.observe(videoElement.value);
+  }
 });
 
 onUnmounted(() => {
   clearInterval(interval);
+  videoObserver?.disconnect();
 });
 </script>
 
@@ -155,20 +179,42 @@ onUnmounted(() => {
       </section>
 
       <section class="social-proof"> 
-        <div class="testimonials">
+        <div class="testimonials">  
           <div class="testimonial-card">
-            <p><span lang="en">"Somebody always kind of has your back."</span> - {{ t('landing.participant') }}</p>
+            <blockquote>
+              <p lang="en">
+                "Somebody always kind of has your back."
+              </p>
+            </blockquote>
+            <cite>{{ t('landing.participant') }}</cite>
           </div>
+
           <div class="testimonial-card">
-            <p><span lang="en">"KulturBooking is a place for people to find their place and their voice."</span> - {{ t('landing.participant') }}</p>
+            <blockquote>
+              <p lang="en">
+                "KulturBooking is a place for people to find their place and their voice."
+              </p>
+            </blockquote>
+            <cite>{{ t('landing.participant') }}</cite>
           </div>
+
           <div class="testimonial-card">
-            <p>{{ t('landing.quote') }} - {{ t('landing.participant') }}</p>
+            <blockquote>
+              <p>{{ t('landing.quote') }}</p>
+            </blockquote>
+            <cite>{{ t('landing.participant') }}</cite>
           </div>
         </div>
-        <div class="highlight-video">
-          <img src="@/assets/img/video_placeholder.jpg" :alt="t('landing.video')" />
 
+        <div class="highlight-video">
+          <video
+            ref="videoElement"
+            :src="socialProofVideo"
+            muted
+            loop
+            playsinline
+            preload="metadata"
+          ></video>
         </div>
       </section>
 
@@ -398,19 +444,57 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  p {
-    color: $hero-text-color;
+  width: 100%;
+}
+
+.testimonial-card {
+  position: relative;
+  padding: 1.5rem;
+  background-color: $background-color;
+  border: 1px solid rgba($hero-text-color, 0.08);
+  border-left: 4px solid $primary-color;
+  border-radius: $radius-card;
+  box-shadow: 0 4px 12px rgba($hero-text-color, 0.08);
+
+  blockquote {
+    margin: 0;
+
+    p {
+      color: $hero-text-color;
+      font-family: $font-body;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.5;
+      margin: 0 0 1rem;
+    }
+  }
+
+  cite {
+    display: block;
+    color: $secondary-color;
     font-family: $font-body;
-    font-style: italic;
-    color: $background-color;
+    font-size: $font-size-label;
+    font-style: normal;
+    font-weight: $font-weight-bold;
+  }
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba($hero-text-color, 0.12);
   }
 }
 
 .highlight-video {
-  img {
+  width: 100%;
+
+  video {
+    display: block;
     width: 100%;
     height: auto;
     border-radius: 8px;
+    object-fit: cover;
   }
 }
 
@@ -475,6 +559,7 @@ onUnmounted(() => {
 
   .testimonials {
     min-width: 50%;
+    max-width: 600px;
   }
 }
 
