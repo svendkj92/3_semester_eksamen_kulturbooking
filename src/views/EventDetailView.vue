@@ -195,7 +195,6 @@ onUnmounted(() => {
           <p :lang="description.lang">{{ description.text }}</p>
         </section>
         <div class="registration-notice">
-          <p v-if="isRegistered" class="registration-success">{{ t('events.registered') }}</p>
           <p v-if="hasStarted" class="registration-warning">{{ t('events.closed') }}</p>
           <p v-else-if="!user">
             {{ t('events.loginRequired') }}
@@ -353,10 +352,6 @@ onUnmounted(() => {
   border-left: 3px solid $success-color;
   border-radius: 4px;
   background-color: $background-color;
-  color: $success-color;
-}
-
-.registration-success {
   color: $success-color;
 }
 
