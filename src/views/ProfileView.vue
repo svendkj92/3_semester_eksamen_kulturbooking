@@ -526,8 +526,6 @@ onUnmounted(() => {
 }
 
 .edit-name-button {
-  width: 30px;
-  height: 30px;
   font-size: 1rem;
 }
 
@@ -625,8 +623,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: $min-touch-target;
+  height: $min-touch-target;
   padding: 0;
   border: 1px solid rgba($secondary-color, 0.3);
   border-radius: 50%;
