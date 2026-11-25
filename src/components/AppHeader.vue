@@ -131,8 +131,9 @@ onUnmounted(() => {
 
   a:focus-visible,
   button:focus-visible {
-    outline: 2px solid $primary-color;
-    outline-offset: 4px;
+    outline: $focus-ring-outer solid $focus-ring-outer-color;
+    outline-offset: $focus-ring-inner;
+    box-shadow: 0 0 0 $focus-ring-inner $focus-ring-inner-color;
     border-radius: 4px;
   }
 }

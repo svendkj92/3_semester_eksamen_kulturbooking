@@ -196,6 +196,10 @@ async function handleLogin() {
     font: inherit;
   }
 
+  input {
+    border-radius: $radius-input;
+  }
+
   button {
     margin-top: 0.5rem;
     border: 0;
