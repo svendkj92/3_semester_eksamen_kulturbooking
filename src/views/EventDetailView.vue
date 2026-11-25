@@ -203,6 +203,7 @@ onUnmounted(() => {
           <button
             v-if="user && (isRegistered || !hasStarted)"
             class="registration-button"
+            :class="{ 'registration-button--cancel': isRegistered }"
             type="button"
             :disabled="isSaving"
             @click="toggleRegistration"
@@ -371,13 +372,27 @@ onUnmounted(() => {
 
 .registration-button {
   margin: 0.75rem 0;
+  min-height: $min-touch-target;
   padding: 0.75rem 1rem;
   border: 0;
-  border-radius: 6px;
-  background-color: $primary-color;
-  color: $background-color;
+  border-radius: $radius-button;
+  background-color: $cta-color;
+  color: $hero-text-color;
   font: inherit;
   cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: $cta-color-hover;
+  }
+
+  &--cancel {
+    background-color: $primary-color;
+    color: $background-color;
+
+    &:hover:not(:disabled) {
+      background-color: $primary-color-hover;
+    }
+  }
 
   &:disabled {
     opacity: 0.6;
@@ -385,8 +400,9 @@ onUnmounted(() => {
   }
 
   &:focus-visible {
-    outline: 2px solid $primary-color;
-    outline-offset: 4px;
+    outline: $focus-ring-outer solid $focus-ring-outer-color;
+    outline-offset: $focus-ring-inner;
+    box-shadow: 0 0 0 $focus-ring-inner $focus-ring-inner-color;
   }
 }
 
