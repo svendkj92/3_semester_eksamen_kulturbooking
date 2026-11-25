@@ -324,7 +324,7 @@ onUnmounted(() => {
   margin-bottom: 1.5rem;
 
   dt {
-    color: $secondary-color;
+    color: $background-color;
     font-size: 0.875rem;
   }
 
