@@ -235,8 +235,8 @@ onUnmounted(() => {
   border: 0;
   border-radius: 16px;
   overflow-y: auto;
-  background-color: $hero-text-color;
-  color: $background-color;
+  background-color: $background-color;
+  color: $hero-text-color;
 
   &::backdrop {
     background-color: rgba($hero-text-color, 0.65);
@@ -264,7 +264,7 @@ onUnmounted(() => {
   border: 1px solid $secondary-color;
   border-radius: 50%;
   background: transparent;
-  color: $background-color;
+  color: $hero-text-color;
   font-size: 1.75rem;
   cursor: pointer;
 
@@ -300,8 +300,8 @@ onUnmounted(() => {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 999px;
-  background-color: $background-color;
-  color: $hero-text-color;
+  background-color: $primary-color;
+  color: #fff;
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -327,7 +327,7 @@ onUnmounted(() => {
   margin-bottom: 1.5rem;
 
   dt {
-    color: $background-color;
+    color: $secondary-color;
     font-size: 0.875rem;
   }
 

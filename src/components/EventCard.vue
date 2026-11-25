@@ -134,8 +134,8 @@ defineEmits(['view-event']);
     left: 1rem;
     padding: 0.4rem 0.8rem;
     border-radius: 50px;
-    background-color: $background-color;
-    color: $hero-text-color;
+    background-color: $primary-color;
+    color: #fff;
     font-size: $font-size-label;
     font-weight: bold;
   }
