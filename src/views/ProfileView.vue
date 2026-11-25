@@ -666,7 +666,7 @@ onUnmounted(() => {
   color: $background-color;
   text-align: center;
   overflow-wrap: anywhere;
-  font-size: 0.8125rem;
+  font-size: $font-size-label;
   font-weight: 600;
 }
 
