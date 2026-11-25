@@ -9,9 +9,10 @@ import { getEvents } from '@/services/eventService';
 import { getRegistrations } from '@/services/registrationService';
 import { useI18n } from 'vue-i18n';
 import { useEventFormatting } from '@/i18n/useEventFormatting';
+import EventCard from '@/components/EventCard.vue';
 
 const { t } = useI18n();
-const { eventDate, eventTime, interestLabel } = useEventFormatting();
+const { interestLabel } = useEventFormatting();
 const user = shallowRef(null);
 const profile = ref(null);
 const interests = ref([]);
@@ -415,22 +416,11 @@ onUnmounted(() => {
           </div>
           <ul v-if="section.events.length" class="event-grid">
             <li v-for="event in section.events" :key="event.id">
-              <article class="event-card">
-                <img class="profile-event-image" :src="event.image" :alt="event.title" loading="lazy" />
-                <div class="event-content">
-                  <h3>{{ event.title }}</h3>
-                  <p>{{ interestLabel(event.category) }}</p>
-                  <p>{{ eventDate(event.startsAt) }} {{ t('common.at') }} {{ eventTime(event.startsAt) }}</p>
-                  <p>{{ event.location }}</p>
-                  <p v-if="event.startsAt <= now">{{ t('events.started') }}</p>
-                  <RouterLink
-                    :to="{ name: 'profile-event-detail', params: { id: event.id } }"
-                    aria-haspopup="dialog"
-                  >
-                    {{ t('common.viewEvent') }}<span class="visually-hidden">: {{ event.title }}</span>
-                  </RouterLink>
-                </div>
-              </article>
+              <EventCard
+                :event="event"
+                detail-route="profile-event-detail"
+                :started="event.startsAt <= now"
+              />
             </li>
           </ul>
           <div v-else class="empty-state">
@@ -684,83 +674,11 @@ onUnmounted(() => {
 
 .event-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 0.75rem;
 
   > li {
     min-width: 0;
-  }
-}
-
-.event-card {
-  height: 100%;
-  overflow: hidden;
-  border: 1px solid rgba($primary-color, 0.2);
-  border-radius: 8px;
-}
-
-.profile-event-image {
-  display: block;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-.event-content a {
-  display: inline-block;
-  margin-top: 0.75rem;
-  color: $primary-color;
-  text-decoration: underline;
-
-  &:focus-visible {
-    outline: 2px solid $primary-color;
-    outline-offset: 3px;
-  }
-}
-
-.event-image {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 4 / 3;
-  padding: 1rem;
-  background-color: rgba($primary-color, 0.12);
-
-  svg {
-    width: 100%;
-    max-width: 200px;
-    stroke: $primary-color;
-    stroke-width: 2;
-    stroke-linejoin: round;
-  }
-}
-
-.event-category {
-  position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  max-width: calc(100% - 1rem);
-  padding: 0.125rem 0.5rem;
-  border-radius: 4px;
-  background-color: $cta-color;
-  color: $hero-text-color;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  overflow-wrap: anywhere;
-}
-
-.event-content {
-  padding: 0.75rem;
-
-  h3 {
-    font-size: 0.875rem;
-    overflow-wrap: anywhere;
-  }
-
-  p {
-    margin-top: 0.5rem;
-    color: $secondary-color;
-    font-size: 0.75rem;
   }
 }
 
@@ -783,8 +701,5 @@ onUnmounted(() => {
     align-items: center;
   }
 
-  .event-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 </style>
