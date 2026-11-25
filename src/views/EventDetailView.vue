@@ -315,8 +315,10 @@ onUnmounted(() => {
 
 .event-content section h2 {
   margin-bottom: 0.5rem;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-family: $font-body;
+  font-size: $font-size-subtitle;
+  line-height: $line-height-subtitle;
+  font-weight: $font-weight-bold;
 }
 
 .event-facts {
