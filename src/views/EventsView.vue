@@ -237,6 +237,12 @@ const filteredEvents = computed(() => {
     color: $background-color;
     border-color: $primary-color;
   }
+
+  &:focus-visible {
+    outline: $focus-ring-outer solid $focus-ring-outer-color;
+    outline-offset: $focus-ring-inner;
+    box-shadow: 0 0 0 $focus-ring-inner $focus-ring-inner-color;
+  }
 }
 
 //Price filters
@@ -263,13 +269,14 @@ const filteredEvents = computed(() => {
     cursor: pointer;
 
     option {
-      color: $background-color;
-      background-color: $hero-text-color;
+      color: $hero-text-color;
+      background-color: $background-color;
     }
 
     &:focus-visible {
-      outline: 2px solid $primary-color;
-      outline-offset: 3px;
+      outline: $focus-ring-outer solid $focus-ring-outer-color;
+      outline-offset: $focus-ring-inner;
+      box-shadow: 0 0 0 $focus-ring-inner $focus-ring-inner-color;
     }
   }
 }
