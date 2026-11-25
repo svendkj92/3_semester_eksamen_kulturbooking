@@ -387,6 +387,13 @@ async function finishOnboarding() {
 
       </form>
 
+      <p class="login-link">
+        {{ t('onboarding.haveAccount') }}
+        <RouterLink :to="{ path: '/login', query: { redirect: route.query.redirect } }">
+          {{ t('common.login') }}
+        </RouterLink>
+      </p>
+
       <p v-if="isCheckingProfile" class="profile-loading" role="status">
         {{ t('onboarding.checkingProfile') }}
       </p>
@@ -579,6 +586,11 @@ async function finishOnboarding() {
 
 .email-error {
   color: $error-color;
+}
+
+.login-link {
+  margin-top: $space-3;
+  text-align: center;
 }
 
 .email-success {
