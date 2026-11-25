@@ -102,7 +102,7 @@ const sections = [
   }
 
   span {
-    font-size: 0.75rem;
+    font-size: $font-size-label;
     letter-spacing: 0.125em;
     text-transform: uppercase;
   }
@@ -119,7 +119,7 @@ const sections = [
   h2 {
     margin-bottom: 0.375rem;
     color: $primary-color;
-    font-size: 0.75rem;
+    font-size: $font-size-label;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -168,8 +168,8 @@ const sections = [
   margin-top: 1.25rem;
 
   p {
-    color: $secondary-color;
-    font-size: 0.75rem;
+    color: $hero-text-color;
+    font-size: $font-size-label;
     text-align: center;
   }
 }
